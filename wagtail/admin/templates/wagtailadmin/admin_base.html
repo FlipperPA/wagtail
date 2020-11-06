@@ -27,6 +27,11 @@
                 EXTRA_CHILDREN_PARAMETERS: '',
             };
 
+            {% i18n_enabled as i18n_enabled %}
+            {% locales as locales %}
+            wagtailConfig.I18N_ENABLED = {% if i18n_enabled %}true{% else %}false{% endif %};
+            wagtailConfig.LOCALES = {{ locales|safe }};
+
             wagtailConfig.STRINGS = {% js_translation_strings %};
 
             wagtailConfig.ADMIN_URLS = {
@@ -34,7 +39,7 @@
             };
         })(document, window);
     </script>
-    <script src="{% versioned_static 'wagtailadmin/js/vendor/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% versioned_static 'wagtailadmin/js/vendor/jquery-3.5.1.min.js' %}"></script>
     <script src="{% versioned_static 'wagtailadmin/js/vendor/jquery-ui-1.12.1.min.js' %}"></script>
     <script src="{% versioned_static 'wagtailadmin/js/vendor/jquery.datetimepicker.js' %}"></script>
     <script src="{% versioned_static 'wagtailadmin/js/vendor/jquery.autosize.js' %}"></script>

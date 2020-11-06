@@ -1,6 +1,6 @@
-import itertools
 import json
 
+from datetime import datetime
 from urllib.parse import urljoin
 
 from django import template
@@ -8,24 +8,32 @@ from django.conf import settings
 from django.contrib.admin.utils import quote
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.contrib.messages.constants import DEFAULT_TAGS as MESSAGE_TAGS
+from django.db.models import Min, QuerySet
 from django.template.defaultfilters import stringfilter
 from django.template.loader import render_to_string
 from django.templatetags.static import static
-from django.utils.html import format_html, format_html_join
+from django.utils import timezone
+from django.utils.encoding import force_str
+from django.utils.html import avoid_wrapping, format_html, format_html_join
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.timesince import timesince
+from django.utils.translation import gettext_lazy as _
 
 from wagtail.admin.localization import get_js_translation_strings
+from wagtail.admin.log_action_registry import registry as log_action_registry
 from wagtail.admin.menu import admin_menu
 from wagtail.admin.navigation import get_explorable_root_page
 from wagtail.admin.search import admin_search_areas
 from wagtail.admin.staticfiles import versioned_static as versioned_static_func
 from wagtail.core import hooks
 from wagtail.core.models import (
-    CollectionViewRestriction, Page, PageViewRestriction, UserPagePermissionsProxy)
+    Collection, CollectionViewRestriction, Locale, Page, PageLogEntry, PageViewRestriction,
+    UserPagePermissionsProxy)
+from wagtail.core.utils import camelcase_to_underscore
 from wagtail.core.utils import cautious_slugify as _cautious_slugify
-from wagtail.core.utils import camelcase_to_underscore, escape_script
+from wagtail.core.utils import escape_script
 from wagtail.users.utils import get_gravatar_url
+
 
 register = template.Library()
 
@@ -427,10 +435,14 @@ def paginate(context, page, base_url='', page_key='p',
 @register.inclusion_tag("wagtailadmin/pages/listing/_buttons.html",
                         takes_context=True)
 def page_listing_buttons(context, page, page_perms, is_parent=False):
+    next_url = context.request.path
     button_hooks = hooks.get_hooks('register_page_listing_buttons')
-    buttons = sorted(itertools.chain.from_iterable(
-        hook(page, page_perms, is_parent)
-        for hook in button_hooks))
+
+    buttons = []
+    for hook in button_hooks:
+        buttons.extend(hook(page, page_perms, is_parent, next_url))
+
+    buttons.sort()
 
     for hook in hooks.get_hooks('construct_page_listing_buttons'):
         hook(buttons, page, page_perms, is_parent, context)
@@ -501,3 +513,134 @@ def versioned_static(path):
     that updates on each Wagtail version
     """
     return versioned_static_func(path)
+
+
+@register.inclusion_tag("wagtailadmin/shared/icon.html", takes_context=False)
+def icon(name=None, class_name='icon', title=None, wrapped=False):
+    """
+    Abstracts away the actual icon implementation.
+
+    Usage:
+        {% load wagtailadmin_tags %}
+        ...
+        {% icon name="cogs" class_name="icon--red" title="Settings" %}
+
+    :param name: the icon name/id, required (string)
+    :param class_name: default 'icon' (string)
+    :param title: accessible label intended for screen readers (string)
+    :return: Rendered template snippet (string)
+    """
+    if not name:
+        raise ValueError("You must supply an icon name")
+
+    return {
+        'name': name,
+        'class_name': class_name,
+        'title': title,
+        'wrapped': wrapped
+    }
+
+
+@register.filter()
+def timesince_simple(d):
+    """
+    Returns a simplified timesince:
+    19 hours, 48 minutes ago -> 19 hours ago
+    1 week, 1 day ago -> 1 week ago
+    0 minutes ago -> just now
+    """
+    time_period = timesince(d).split(',')[0]
+    if time_period == avoid_wrapping(_('0 minutes')):
+        return _("Just now")
+    return _("%(time_period)s ago") % {'time_period': time_period}
+
+
+@register.simple_tag
+def timesince_last_update(last_update, time_prefix='', use_shorthand=True):
+    """
+    Returns:
+         - the time of update if last_update is today, if any prefix is supplied, the output will use it
+         - time since last update othewise. Defaults to the simplified timesince,
+           but can return the full string if needed
+    """
+    if last_update.date() == datetime.today().date():
+        if timezone.is_aware(last_update):
+            time_str = timezone.localtime(last_update).strftime("%H:%M")
+        else:
+            time_str = last_update.strftime("%H:%M")
+
+        return time_str if not time_prefix else '%(prefix)s %(formatted_time)s' % {
+            'prefix': time_prefix, 'formatted_time': time_str
+        }
+    else:
+        if use_shorthand:
+            return timesince_simple(last_update)
+        return _("%(time_period)s ago") % {'time_period': timesince(last_update)}
+
+
+@register.filter
+def format_action_log_message(log_entry):
+    if not isinstance(log_entry, PageLogEntry):
+        return ''
+    return log_action_registry.format_message(log_entry)
+
+
+@register.simple_tag
+def format_collection(coll: Collection, min_depth: int = 2) -> str:
+    """
+    Renders a given Collection's name as a formatted string that displays its
+    hierarchical depth via indentation. If min_depth is supplied, the
+    Collection's depth is rendered relative to that depth. min_depth defaults
+    to 2, the depth of the first non-Root Collection.
+
+    Example usage: {% format_collection collection min_depth %}
+    Example output: "&nbsp;&nbsp;&nbsp;&nbsp;&#x21b3 Child Collection"
+    """
+    return coll.get_indented_name(min_depth, html=True)
+
+
+@register.simple_tag
+def minimum_collection_depth(collections: QuerySet) -> int:
+    """
+    Returns the minimum depth of the Collections in the given queryset.
+    Call this before beginning a loop through Collections that will
+    use {% format_collection collection min_depth %}.
+    """
+    return collections.aggregate(Min('depth'))['depth__min'] or 2
+
+
+@register.filter
+def user_display_name(user):
+    """
+    Returns the preferred display name for the given user object: the result of
+    user.get_full_name() if implemented and non-empty, or user.get_username() otherwise.
+    """
+    try:
+        full_name = user.get_full_name().strip()
+        if full_name:
+            return full_name
+    except AttributeError:
+        pass
+
+    try:
+        return user.get_username()
+    except AttributeError:
+        # we were passed None or something else that isn't a valid user object; return
+        # empty string to replicate the behaviour of {{ user.get_full_name|default:user.get_username }}
+        return ''
+
+
+@register.simple_tag
+def i18n_enabled():
+    return getattr(settings, 'WAGTAIL_I18N_ENABLED', False)
+
+
+@register.simple_tag
+def locales():
+    return json.dumps([
+        {
+            'code': locale.language_code,
+            'display_name': force_str(locale.get_display_name()),
+        }
+        for locale in Locale.objects.all()
+    ])

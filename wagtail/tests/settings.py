@@ -1,5 +1,6 @@
 import os
 
+
 DEBUG = False
 WAGTAIL_ROOT = os.path.dirname(os.path.dirname(__file__))
 STATIC_ROOT = os.path.join(WAGTAIL_ROOT, 'tests', 'test-static')
@@ -46,7 +47,9 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-USE_TZ = True
+USE_TZ = not os.environ.get('DISABLE_TIMEZONE')
+if not USE_TZ:
+    print("Timezone support disabled")
 
 LANGUAGE_CODE = "en"
 
@@ -93,13 +96,11 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
     'wagtail.tests.middleware.BlockDodgyUserAgentMiddleware',
-    'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     # Install wagtailredirects with its appconfig
     # Theres nothing special about wagtailredirects, we just need to have one
     # app which uses AppConfigs to test that hooks load properly
@@ -107,11 +108,11 @@ INSTALLED_APPS = (
 
     'wagtail.tests.testapp',
     'wagtail.tests.demosite',
-    'wagtail.tests.customuser',
     'wagtail.tests.snippets',
     'wagtail.tests.routablepage',
     'wagtail.tests.search',
     'wagtail.tests.modeladmintest',
+    'wagtail.tests.i18n',
     'wagtail.contrib.styleguide',
     'wagtail.contrib.routable_page',
     'wagtail.contrib.frontend_cache',
@@ -124,6 +125,7 @@ INSTALLED_APPS = (
     'wagtail.embeds',
     'wagtail.images',
     'wagtail.sites',
+    'wagtail.locales',
     'wagtail.users',
     'wagtail.snippets',
     'wagtail.documents',
@@ -141,7 +143,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
-)
+]
 
 
 # Using DatabaseCache to make sure that the cache is cleared between tests.
@@ -158,7 +160,7 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',  # don't use the intentionally slow default password hasher
 )
 
-ALLOWED_HOSTS = ['localhost', 'testserver']
+ALLOWED_HOSTS = ['localhost', 'testserver', 'other.example.com']
 
 WAGTAILSEARCH_BACKENDS = {
     'default': {
@@ -166,13 +168,25 @@ WAGTAILSEARCH_BACKENDS = {
     }
 }
 
-AUTH_USER_MODEL = 'customuser.CustomUser'
+if os.environ.get('USE_EMAIL_USER_MODEL'):
+    INSTALLED_APPS.append('wagtail.tests.emailuser')
+    AUTH_USER_MODEL = 'emailuser.EmailUser'
+    print("EmailUser (no username) user model active")
+else:
+    INSTALLED_APPS.append('wagtail.tests.customuser')
+    AUTH_USER_MODEL = 'customuser.CustomUser'
+    # Extra user field for custom user edit and create form tests. This setting
+    # needs to here because it is used at the module level of wagtailusers.forms
+    # when the module gets loaded. The decorator 'override_settings' does not work
+    # in this scenario.
+    WAGTAIL_USER_CUSTOM_FIELDS = ['country', 'attachment']
 
 if os.environ.get('DATABASE_ENGINE') == 'django.db.backends.postgresql':
     INSTALLED_APPS += ('wagtail.contrib.postgres_search',)
     WAGTAILSEARCH_BACKENDS['postgresql'] = {
         'BACKEND': 'wagtail.contrib.postgres_search.backend',
         'AUTO_UPDATE': False,
+        'SEARCH_CONFIG': 'english'
     }
 
 if 'ELASTICSEARCH_URL' in os.environ:
@@ -182,8 +196,6 @@ if 'ELASTICSEARCH_URL' in os.environ:
         backend = 'wagtail.search.backends.elasticsearch6'
     elif os.environ.get('ELASTICSEARCH_VERSION') == '5':
         backend = 'wagtail.search.backends.elasticsearch5'
-    elif os.environ.get('ELASTICSEARCH_VERSION') == '2':
-        backend = 'wagtail.search.backends.elasticsearch2'
 
     WAGTAILSEARCH_BACKENDS['elasticsearch'] = {
         'BACKEND': backend,
@@ -203,12 +215,6 @@ if 'ELASTICSEARCH_URL' in os.environ:
 
 WAGTAIL_SITE_NAME = "Test Site"
 
-# Extra user field for custom user edit and create form tests. This setting
-# needs to here because it is used at the module level of wagtailusers.forms
-# when the module gets loaded. The decorator 'override_settings' does not work
-# in this scenario.
-WAGTAIL_USER_CUSTOM_FIELDS = ['country', 'attachment']
-
 WAGTAILADMIN_RICH_TEXT_EDITORS = {
     'default': {
         'WIDGET': 'wagtail.admin.rich_text.DraftailRichTextArea'
@@ -220,6 +226,12 @@ WAGTAILADMIN_RICH_TEXT_EDITORS = {
         'WIDGET': 'wagtail.tests.testapp.rich_text.CustomRichTextArea'
     },
 }
+
+
+WAGTAIL_CONTENT_LANGUAGES = [
+    ("en", "English"),
+    ("fr", "French"),
+]
 
 
 # Set a non-standard DEFAULT_AUTHENTICATION_CLASSES value, to verify that the

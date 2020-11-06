@@ -1,5 +1,4 @@
 from django import VERSION as DJANGO_VERSION
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 
@@ -230,7 +229,7 @@ class TestChooseParentView(TestCase, WagtailTestUtils):
     def test_no_parent_exists(self):
         response = self.client.get('/admin/tests/businesschild/choose_parent/')
 
-        self.assertEqual(response.status_code, 403)
+        self.assertRedirects(response, '/admin/')
 
     def test_post(self):
         response = self.client.post('/admin/tests/eventpage/choose_parent/', {
@@ -278,10 +277,10 @@ class TestChooseParentViewForNonSuperuser(TestCase, WagtailTestUtils):
             permission_type='add'
         )
 
-        user = get_user_model().objects._create_user(username='test2', email='test2@email.com', password='password', is_staff=True, is_superuser=False)
+        user = self.create_user(username='test2', password='password')
         user.groups.add(business_editors)
         # Login
-        self.client.login(username='test2', password='password')
+        self.login(username='test2', password='password')
 
     def test_simple(self):
         response = self.client.get('/admin/tests/businesschild/choose_parent/')
@@ -291,44 +290,34 @@ class TestChooseParentViewForNonSuperuser(TestCase, WagtailTestUtils):
         self.assertNotContains(response, 'Private Business Index')
 
 
-class TestEditorAccess(TestCase):
+class TestEditorAccess(TestCase, WagtailTestUtils):
     fixtures = ['test_specific.json']
-    expected_status_code = 403
 
-    def login(self):
+    def setUp(self):
         # Create a user
-        user = get_user_model().objects._create_user(username='test2', email='test2@email.com', password='password', is_staff=True, is_superuser=False)
+        user = self.create_user(username='test2', password='password')
         user.groups.add(Group.objects.get(pk=2))
         # Login
-        self.client.login(username='test2', password='password')
-        return user
-
-    def setUp(self):
-        self.login()
+        self.login(username='test2', password='password')
 
     def test_delete_permitted(self):
         response = self.client.get('/admin/tests/eventpage/delete/4/')
-        self.assertEqual(response.status_code, self.expected_status_code)
+        self.assertRedirects(response, '/admin/')
 
 
-class TestModeratorAccess(TestCase):
+class TestModeratorAccess(TestCase, WagtailTestUtils):
     fixtures = ['test_specific.json']
-    expected_status_code = 302
 
-    def login(self):
+    def setUp(self):
         # Create a user
-        user = get_user_model().objects._create_user(username='test3', email='test3@email.com', password='password', is_staff=True, is_superuser=False)
+        user = self.create_user(username='test3', password='password')
         user.groups.add(Group.objects.get(pk=1))
         # Login
-        self.client.login(username='test2', password='password')
-        return user
-
-    def setUp(self):
-        self.login()
+        self.login(username='test3', password='password')
 
     def test_delete_permitted(self):
         response = self.client.get('/admin/tests/eventpage/delete/4/')
-        self.assertEqual(response.status_code, self.expected_status_code)
+        self.assertRedirects(response, '/admin/pages/4/delete/?next=/admin/tests/eventpage/')
 
 
 class TestHeaderBreadcrumbs(TestCase, WagtailTestUtils):
@@ -350,7 +339,20 @@ class TestHeaderBreadcrumbs(TestCase, WagtailTestUtils):
         self.assertTemplateUsed(response, 'wagtailadmin/shared/header.html')
 
         # check that home breadcrumb link exists
-        self.assertContains(response, '<li class="home"><a href="/admin/" class="icon icon-home text-replace">Home</a></li>', html=True)
+        expected = """
+            <li class="home">
+                <a href="/admin/">
+                    <svg class="icon icon-home home_icon" aria-hidden="true" focusable="false">
+                        <use href="#icon-home"></use>
+                    </svg>
+                    <span class="visuallyhidden">Home</span>
+                    <svg class="icon icon-arrow-right arrow_right_icon" aria-hidden="true" focusable="false">
+                        <use href="#icon-arrow-right"></use>
+                    </svg>
+                </a>
+            </li>
+        """
+        self.assertContains(response, expected, html=True)
 
         # check that the breadcrumbs are after the header opening tag
         content_str = str(response.content)
@@ -366,7 +368,20 @@ class TestHeaderBreadcrumbs(TestCase, WagtailTestUtils):
         self.assertTemplateUsed(response, 'wagtailadmin/shared/header.html')
 
         # check that home breadcrumb link exists
-        self.assertContains(response, '<li class="home"><a href="/admin/" class="icon icon-home text-replace">Home</a></li>', html=True)
+        expected = """
+            <li class="home">
+                <a href="/admin/">
+                    <svg class="icon icon-home home_icon" aria-hidden="true" focusable="false">
+                        <use href="#icon-home"></use>
+                    </svg>
+                    <span class="visuallyhidden">Home</span>
+                    <svg class="icon icon-arrow-right arrow_right_icon" aria-hidden="true" focusable="false">
+                        <use href="#icon-arrow-right"></use>
+                    </svg>
+                </a>
+            </li>
+        """
+        self.assertContains(response, expected, html=True)
 
         # check that the breadcrumbs are after the header opening tag
         content_str = str(response.content)

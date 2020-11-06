@@ -8,17 +8,17 @@
 # First Last <abc+github@mynook.info>, 2019
 # Fred Zeng <979738295@qq.com>, 2016
 # hanfeng <appweb.cn@gmail.com>, 2014
-# jszsj <zhushajun@gmail.com>, 2017
+# 祝沙军 <zhushajun@gmail.com>, 2017
 # Vincent Zhao <zhaopu2008@gmail.com>, 2017
-# jszsj <zhushajun@gmail.com>, 2017
+# 祝沙军 <zhushajun@gmail.com>, 2017
 # 汇民 王 <whuim@qq.com>, 2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 17:59+0100\n"
-"PO-Revision-Date: 2019-11-01 02:56+0000\n"
-"Last-Translator: First Last <abc+github@mynook.info>\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:37+0000\n"
+"Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/torchbox/wagtail/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid "Save"
+msgstr "保存"
 
 msgid "Wagtail snippets"
 msgstr "Wagtail 片段"
@@ -64,6 +70,9 @@ msgstr ""
 "\"%(wagtailsnippets_create_snippet_url)s\" target=\"_blank\" rel=\"noopener "
 "noreferrer\">创建一个</a>吗？"
 
+msgid "Saving…"
+msgstr "正在保存……"
+
 #, python-format
 msgid "Delete %(snippet_type_name)s"
 msgstr "删除 %(snippet_type_name)s"
@@ -97,11 +106,8 @@ msgstr "新建  %(snippet_type_name)s "
 msgid "New"
 msgstr "新增"
 
-msgid "Saving…"
-msgstr "正在保存……"
-
-msgid "Save"
-msgstr "保存"
+msgid "Actions"
+msgstr "动作"
 
 #, python-format
 msgid "Editing %(snippet_type_name)s - %(instance)s"
@@ -109,12 +115,6 @@ msgstr "正在编辑 %(snippet_type_name)s - %(instance)s"
 
 msgid "Editing"
 msgstr "编辑"
-
-msgid "Actions"
-msgstr "动作"
-
-msgid "Delete"
-msgstr "删除"
 
 msgid "Usage"
 msgstr "使用情况"

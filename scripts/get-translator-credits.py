@@ -1,9 +1,11 @@
-import subprocess
 import re
+import subprocess
+
 from collections import defaultdict
 from io import open
 
 from babel import Locale
+
 
 authors_by_locale = defaultdict(set)
 
@@ -24,7 +26,10 @@ for file_listing_line in file_listing.stdout:
             line = line.strip()
             if line.startswith('#'):
                 if has_found_translators_heading:
-                    author = re.match(r'\# (.*), [\d\-]+', line).group(1)
+                    author_match = re.match(r'\# (.*), [\d\-]+', line)
+                    if not author_match:
+                        break
+                    author = author_match.group(1)
                     authors_by_locale[locale].add(author)
                 elif line.startswith('# Translators:'):
                     has_found_translators_heading = True
@@ -37,6 +42,7 @@ for file_listing_line in file_listing.stdout:
 
 LANGUAGE_OVERRIDES = {
     'tet': 'Tetum',
+    'ht': 'Haitian',
 }
 
 
@@ -45,6 +51,7 @@ def get_language_name(locale_string):
         return LANGUAGE_OVERRIDES[locale_string]
     except KeyError:
         return Locale.parse(locale_string).english_name
+
 
 language_names = [
     (get_language_name(locale_string), locale_string)

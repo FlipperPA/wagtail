@@ -1,37 +1,316 @@
 Changelog
 =========
 
-2.8 (xx.xx.xxxx) - IN DEVELOPMENT
+2.12 (xx.xx.xxxx) - IN DEVELOPMENT
+~~~~~~~~~~~~~~~~~
+
+ * Added support for Python 3.9
+
+
+2.11.1 (xx.xx.xxxx) - IN DEVELOPMENT
+~~~~~~~~~~~~~~~~~~~
+
+ * Fix: Ensure that cached `wagtail_site_root_paths` structures from older Wagtail versions are invalidated (Sævar Öfjörð Magnússon)
+ * Fix: Avoid circular import between wagtail.admin.auth and custom user models (Matt Westcott)
+
+
+2.11 LTS (02.11.2020)
+~~~~~~~~~~~~~~~~~~~~~
+
+ * Add support for multi-lingual content (Karl Hobley)
+ * Add support for aliased pages (Karl Hobley)
+ * Add support for hierarchical/nested Collections (Robert Rollins)
+ * Extend treebeard's `fix_tree` method with the ability to non-destructively fix path issues and add a --full option to apply path fixes (Matt Westcott)
+ * Add `before_edit_snippet`, `before_create_snippet` and `before_delete_snippet` hooks and documentation (Karl Hobley. Sponsored by the Mozilla Foundation)
+ * Add `register_snippet_listing_buttons` and `construct_snippet_listing_buttons` hooks and documentation (Karl Hobley. Sponsored by the Mozilla Foundation)
+ * Add `wagtail --version` to available Wagtail CLI commands (Kalob Taulien)
+ * Add `hooks.register_temporarily` utility function for testing hooks (Karl Hobley. Sponsored by the Mozilla Foundation)
+ * Remove `unidecode` and use `anyascii` in for Unicode to ASCII conversion (Robbie Mackay)
+ * Add `render` helper to `RoutablePageMixin` to support serving template responses according to Wagtail conventions (Andy Babic)
+ * Specify minimum Python version in setup.py (Vince Salvino)
+ * Show user's full name in report views (Matt Westcott)
+ * Improve Wagtail admin page load performance by caching SVG icons sprite in localStorage (Coen van der Kamp)
+ * Support SVG icons in ModelAdmin menu items (Scott Cranfill)
+ * Support SVG icons in admin breadcrumbs (Coen van der Kamp)
+ * Serve PDFs inline in the browser (Matt Westcott)
+ * Make document `content-type` and `content-disposition` configurable via `WAGTAILDOCS_CONTENT_TYPES` and `WAGTAILDOCS_INLINE_CONTENT_TYPES` (Matt Westcott)
+ * Slug generation no longer removes stopwords (Andy Chosak, Scott Cranfill)
+ * Add check to disallow StreamField block names that do not match Python variable syntax (François Poulain)
+ * The `BASE_URL` setting is now converted to a string, if it isn't already, when constructing API URLs (thenewguy)
+ * Preview from 'pages awaiting moderation' now opens in a new window (Cynthia Kiser)
+ * Add document extension validation if `WAGTAIL_DOCS_EXTENSIONS` is set (Meghana Bhange)
+ * Use `django-admin` command in place of `django-admin.py` (minusf)
+ * Add `register_snippet_action_menu_item` and `construct_snippet_action_menu` hooks to modify the actions available when creating / editing a snippet (Karl Hobley)
+ * Moved `generate_signature` and `verify_signature` functions into `wagtail.images.utils` (Noah H)
+ * Implement `bulk_to_python` on all structural StreamField block types (Matt Westcott)
+ * Add natural key support to `GroupCollectionPermission` (Jim Jazwiecki)
+ * Implement `prepopulated_fields` for `wagtail.contrib.modeladmin` (David Bramwell)
+ * Change `classname` keyword argument on basic StreamField blocks to `form_classname` (Meghana Bhange)
+ * Replace page explorer pushPage/popPage with gotoPage for more flexible explorer navigation (Karl Hobley)
+ * Fix: Make page-level actions accessible to keyboard users in page listing tables (Jesse Menn)
+ * Fix: `WAGTAILFRONTENDCACHE_LANGUAGES` was being interpreted incorrectly. It now accepts a list of strings, as documented (Karl Hobley)
+ * Fix: Update oEmbed endpoints to use https where available (Matt Westcott)
+ * Fix: Revise `edit_handler` bind order in ModelAdmin views and fix duplicate form instance creation (Jérôme Lebleu)
+ * Fix: Properly distinguish child blocks when comparing revisions with nested StreamBlocks (Martin Mena)
+ * Fix: Correctly handle Turkish 'İ' characters in client-side slug generation (Matt Westcott)
+ * Fix: Page chooser widgets now reflect custom ``get_admin_display_title`` methods (Saptak Sengupta)
+ * Fix: `Page.copy()` now raises an error if the page being copied is unsaved (Anton Zhyltsou)
+ * Fix: `Page.copy()` now triggers a `page_published` if the copied page is live (Anton Zhyltsou)
+ * Fix: The Elasticsearch `URLS` setting can now take a string on its own instead of a list (Sævar Öfjörð Magnússon)
+ * Fix: Avoid retranslating month / weekday names that Django already provides (Matt Westcott)
+ * Fix: Fixed padding around checkbox and radio inputs (Cole Maclean)
+ * Fix: Fix spacing around the privacy indicator panel (Sævar Öfjörð Magnússon, Dan Braghis)
+ * Fix: Consistently redirect to admin home on permission denied (Matt Westcott, Anton Zhyltsou)
+
+
+2.10.2 (25.09.2020)
+~~~~~~~~~~~~~~~~~~~
+
+ * Fix: Avoid use of `icon` class name on userbar icon to prevent clashes with front-end styles (Karran Besen)
+ * Fix: Prevent focused button labels from displaying as white on white (Karran Bessen)
+ * Fix: Avoid showing preview button on moderation dashboard for page types with preview disabled (Dino Perovic)
+ * Fix: Prevent oversized buttons in moderation dashboard panel (Dan Braghis)
+ * Fix: `create_log_entries_from_revisions` now handles revisions that cannot be restored due to foreign key constraints (Matt Westcott)
+
+
+2.10.1 (26.08.2020)
+~~~~~~~~~~~~~~~~~~~
+
+ * Fix: Prevent `create_log_entries_from_revisions` command from failing when page model classes are missing (Dan Braghis)
+ * Fix: Prevent page audit log views from failing for user models without a `username` field (Vyacheslav Matyukhin)
+ * Fix: Fix icon alignment on menu items (Coen van der Kamp)
+ * Fix: Page editor header bar now correctly shows 'Published' or 'Draft' status when no revisions exist (Matt Westcott)
+ * Fix: Prevent page editor from failing when `USE_TZ` is false (Matt Westcott)
+ * Fix: Ensure whitespace between block-level elements is preserved when stripping tags from rich text for search indexing (Matt Westcott)
+
+
+2.10 (11.08.2020)
+~~~~~~~~~~~~~~~~~
+
+ * Added Django 3.1 support (Matt Westcott, Karl Hobley)
+ * Removed support for Python 3.5
+ * Implemented configurable moderation workflow (Jacob Topp-Mugglestone, Karl Hobley, Matt Westcott, Dan Braghis)
+ * Implemented phrase searching and structured search query expressions (Karl Hobley)
+ * Add ability to import redirects from an uploaded file (CSV, TSV, XLS, and XLSX) (Martin Sandström)
+ * Added `webpquality` and `format-webp-lossless` image filters and `WAGTAILIMAGES_WEBP_QUALITY` setting (Nikolay Lukyanov)
+ * Reorganised Dockerfile in project template to follow best practices (Tomasz Knapik, Jannik Wempe)
+ * Added filtering to locked pages report (Karl Hobley)
+ * Adds ability to view a group's users via standalone admin URL and a link to this on the group edit view (Karran Besen)
+ * Redirect to previous url when deleting/copying/unpublish a page and modify this url via the relevant hooks (Ascani Carlo)
+ * Added `next_url` keyword argument on `register_page_listing_buttons` and `register_page_listing_more_buttons` hooks (Ascani Carlo, Matt Westcott, LB (Ben Johnston))
+ * `AbstractEmailForm` will use `SHORT_DATETIME_FORMAT` and `SHORT_DATE_FORMAT` Django settings to format date/time values in email (Haydn Greatnews)
+ * `AbstractEmailForm` now has a separate method (`render_email`) to build up email content on submission emails (Haydn Greatnews)
+ * Add `pre_page_move` and `post_page_move` signals (Andy Babic)
+ * Add ability to sort search promotions on listing page (Chris Ranjana, LB (Ben Johnston))
+ * Upgrade internal JS tooling; Node v10, Gulp v4 & Jest v23 (Jim Jazwiecki, Kim LaRocca, Thibaud Colas)
+ * Add `after_publish_page`, `before_publish_page`, `after_unpublish_page` & `before_unpublish_page` hooks (Jonatas Baldin, Coen van der Kamp)
+ * Add convenience `page_url` shortcut to improve how page URLs can be accessed from site settings in Django templates (Andy Babic)
+ * Show more granular error messages from Pillow when uploading images (Rick van Hattem)
+ * Add ordering to `Site` object, so that index page and `Site` switcher will be sorted consistently (Coen van der Kamp, Tim Leguijt)
+ * Add Reddit to oEmbed provider list (Luke Hardwick)
+ * Add ability to replace the default Wagtail logo in the userbar, via `branding_logo` block (Meteor0id)
+ * Remove sticky footer on small devices, so that content is not blocked and more easily editable (Saeed Tahmasebi)
+ * Add `alt` property to `ImageRenditionField` api representation (Liam Mullens)
+ * Add `purge_revisions` management command to purge old page revisions (Jacob Topp-Mugglestone, Tom Dyson)
+ * Render the Wagtail User Bar on non `Page` views (Caitlin White, Coen van der Kamp)
+ * Add ability to define `form_classname` on `ListBlock` & `StreamBlock` (LB (Ben Johnston))
+ * Add documentation about how to use `Rustface` for image feature detection (Neal Todd)
+ * Improve performance of public/not_public queries in `PageQuerySet` (Timothy Bautista)
+ * Add `add_redirect` static method to `Redirect` class for programmatic redirect creation (Brylie Christopher Oxley, Lacey Williams Henschel)
+ * Add reference documentation for `wagtail.contrib.redirects` (LB (Ben Johnston))
+ * `bulk_delete` page permission is no longer required to move pages, even if those pages have children (Robert Rollins, LB (Ben Johnston))
+ * Add `after_edit_snippet`, `after_create_snippet` and `after_delete_snippet` hooks and documentation (Kalob Taulien)
+ * Improve performance of empty search results by avoiding downloading the entire search index in these scenarios (Lars van de Kerkhof, Coen van der Kamp)
+ * Replace `gulp-sass` with `gulp-dart-sass` to improve core development across different platforms (Thibaud Colas)
+ * Add SVG icons to resolve accessibility and customisation issues and start using them in a subset of Wagtail's admin (Coen van der Kamp, Scott Cranfill, Thibaud Colas, Dan Braghis)
+ * Switch userbar and header H1s to use SVG icons (Coen van der Kamp)
+ * Remove markup around rich text rendering by default, provide a way to use old behaviour via `wagtail.contrib.legacy.richtext` (Coen van der Kamp, Dan Braghis)
+ * Apply title length normalisation to improve ranking on PostgreSQL search (Karl Hobley)
+ * Add `WAGTAIL_TIME_FORMAT` setting (Jacob Topp-Mugglestone)
+ * Allow omitting the default editor from `WAGTAILADMIN_RICH_TEXT_EDITORS` (Gassan Gousseinov)
+ * Disable password auto-completion on user creation form (Samir Shah)
+ * Upgrade jQuery to version 3.5.1 to reduce penetration testing false positives (Matt Westcott)
+ * Add ability to extend `EditHandler` without a children attribute (Seb Brown)
+ * `Page.objects.specific` now gracefully handles pages with missing specific records (Andy Babic)
+ * StreamField 'add' buttons are now disabled when maximum count is reached (Max Gabrielsson)
+ * Use underscores for form builder field names to allow use as template variables (Ashia Zawaduk, LB (Ben Johnston))
+ * Deprecate use of unidecode within form builder field names (Michael van Tellingen, LB (Ben Johnston))
+ * Improve error feedback when editing a page with a missing model class (Andy Babic)
+ * Change Wagtail tabs implementation to only allow slug-formatted tab identifiers, reducing false positives from security audits (Matt Westcott)
+ * Add skip link for keyboard users to bypass Wagtail navigation in the admin (Martin Coote)
+ * Ensure errors during Postgres search indexing are left uncaught to assist troubleshooting (Karl Hobley)
+ * Add ability to edit images and embeds in rich text editor (Maylon Pedroso, Samuel Mendes, Gabriel Peracio)
+ * Fix: Support IPv6 domain (Alex Gleason, Coen van der Kamp)
+ * Fix: Ensure link to add a new user works when no users are visible in the users list (LB (Ben Johnston))
+ * Fix: `AbstractEmailForm` saved submission fields are now aligned with the email content fields, `form.cleaned_data` will be used instead of `form.fields` (Haydn Greatnews)
+ * Fix: Removed ARIA `role="table"` from TableBlock output (Thibaud Colas)
+ * Fix: Set Cache-Control header to prevent page preview responses from being cached (Tomas Walch)
+ * Fix: Accept unicode characters in slugs on the "copy page" form (François Poulain)
+ * Fix: Remove top padding when `FieldRowPanel` is used inside a `MultiFieldPanel` (Jérôme Lebleu)
+ * Fix: Add Wagtail User Bar back to page previews and ensure moderation actions are available (Coen van der Kamp)
+ * Fix: Resolve issue where queryset annotations were lost (e.g. `.annotate_score()`) when using specific models in page query (Dan Bentley)
+ * Fix: Prevent date/time picker from losing an hour on losing focus when 12-hour times are in use (Jacob Topp-Mugglestone)
+ * Fix: Strip out HTML tags from `RichTextField` & `RichTextBlock` search index content (Timothy Bautista)
+ * Fix: Avoid using null on string `Site.site_name` blank values to avoid different values for no name (Coen van der Kamp)
+ * Fix: Fix deprecation warnings on Elasticsearch 7 (Yngve Høiseth)
+ * Fix: Remove use of Node.forEach for IE 11 compatibility in admin menu items (Thibaud Colas)
+ * Fix: Fix incorrect method name in SiteMiddleware deprecation warning (LB (Ben Johnston))
+ * Fix: `wagtail.contrib.sitemaps` no longer depends on SiteMiddleware (Matt Westcott)
+ * Fix: Purge image renditions cache when renditions are deleted (Pascal Widdershoven, Matt Westcott)
+ * Fix: Image / document forms now display non-field errors such as `unique_together` constraints (Matt Westcott)
+ * Fix: Make "Site" chooser in site settings translatable (Andreas Bernacca)
+ * Fix: Add missing dropdown icons to image upload, document upload, and site settings screens (Andreas Bernacca)
+ * Fix: Prevent snippets’ bulk delete button from being present for screen reader users when it’s absent for sighted users (LB (Ben Johnston))
+ * Fix: Fix group permission checkboxes not being clickable in IE11 (LB (Ben Johnston))
+
+
+2.9.3 (20.07.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: CVE-2020-15118 - prevent HTML injection through form field help text (Timothy Bautista, Matt Westcott)
+
+
+2.9.2 (03.07.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: Prevent startup failure when `wagtail.contrib.sitemaps` is in `INSTALLED_APPS` (Matt Westcott)
+
+
+2.9.1 (30.06.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: Fix incorrect method name in SiteMiddleware deprecation warning (LB (Ben Johnston))
+ * Fix: `wagtail.contrib.sitemaps` no longer depends on SiteMiddleware (Matt Westcott)
+ * Fix: Purge image renditions cache when renditions are deleted (Pascal Widdershoven, Matt Westcott)
+
+
+2.9 (04.05.2020)
+~~~~~~~~~~~~~~~~
+
+ * Removed support for Django 2.1
+ * Added data exports in XLSX and CSV format for reports, ModelAdmin and form submissions (Jacob Topp-Mugglestone)
+ * Added support for creating custom reports (Jacob Topp-Mugglestone)
+ * Skip page validation when unpublishing a page (Samir Shah)
+ * Added `MultipleChoiceBlock` block type for StreamField (James O'Toole)
+ * ChoiceBlock now accepts a `widget` keyword argument (James O'Toole)
+ * Reduced contrast of rich text toolbar (Jack Paine)
+ * Support the rel attribute on custom ModelAdmin buttons (Andy Chosak)
+ * Server-side page slug generation now respects `WAGTAIL_ALLOW_UNICODE_SLUGS` (Arkadiusz Michał Ryś)
+ * Wagtail admin no longer depends on SiteMiddleware, avoiding incompatibility with Django sites framework and redundant database queries (aritas1, timmysmalls, Matt Westcott)
+ * Tag field autocompletion now handles custom tag models (Matt Westcott)
+ * `wagtail_serve` URL route can now be omitted for headless sites (Storm Heg)
+ * Allow free tagging to be disabled on custom tag models (Matt Westcott)
+ * Allow disabling page preview by setting `preview_modes` to an empty list (Casper Timmers)
+ * Add Vidyard to oEmbed provider list (Steve Lyall)
+ * Optimise compiling media definitions for complex StreamBlocks (pimarc)
+ * FieldPanel now accepts a 'heading' argument (Jacob Topp-Mugglestone)
+ * Replaced deprecated `ugettext` / `ungettext` calls with `gettext` / `ngettext` (Mohamed Feddad)
+ * ListBlocks now call child block `bulk_to_python` if defined (Andy Chosak)
+ * Site settings are now identifiable/cachable by request as well as site (Andy Babic)
+ * Added `select_related` attribute to site settings to enable more efficient fetching of foreign key values (Andy Babic)
+ * Add caching of image renditions (Tom Dyson, Tim Kamanin)
+ * Add documentation for reporting security issues and internationalisation (Matt Westcott)
+ * Fields on a custom image model can now be defined as required `blank=False` (Matt Westcott)
+ * Fix: CVE-2020-11037 - avoid potential timing attack on password-protected private pages (Thibaud Colas)
+ * Fix: Added ARIA alert role to live search forms in the admin (Casper Timmers)
+ * Fix: Reorder login form elements to match expected tab order (Kjartan Sverrisson)
+ * Fix: Re-add 'Close Explorer' button on mobile viewports (Sævar Öfjörð Magnússon)
+ * Fix: Add a more descriptive label to Password reset link for screen reader users (Casper Timmers, Martin Coote)
+ * Fix: Improve Wagtail logo contrast by adding a background (Brian Edelman, Simon Evans, Ben Enright)
+ * Fix: Prevent duplicate notification messages on page locking (Jacob Topp-Mugglestone)
+ * Fix: Fix InlinePanel item non field errors not visible (Storm Heg)
+ * Fix: `{% image ... as var %}` now clears the context variable when passed None as an image (Maylon Pedroso)
+ * Fix: `refresh_index` method on Elasticsearch no longer fails (Lars van de Kerkhof)
+ * Fix: Document tags no longer fail to update when replacing the document file at the same time (Matt Westcott)
+ * Fix: Prevent error from very tall / wide images being resized to 0 pixels (Fidel Ramos)
+ * Fix: Remove excess margin when editing snippets (Quadric)
+ * Fix: Added `scope` attribute to table headers in TableBlock output (Quadric)
+ * Fix: Prevent KeyError when accessing a StreamField on a deferred queryset (Paulo Alvarado)
+ * Fix: Hide empty 'view live' links (Karran Besen)
+ * Fix: Mark up a few strings for translation (Luiz Boaretto)
+ * Fix: Invalid focal_point attribute on image edit view (Michał (Quadric) Sieradzki)
+ * Fix: No longer expose the `.delete()` method on the default Page.objects manager (Nick Smith)
+ * Fix: `exclude_fields_in_copy` on Page models will now work for for modelcluster parental / many to many relations (LB (Ben Johnston))
+ * Fix: Response header (content disposition) now correctly handles filenames with non-ascii characters when using a storage backend (Rich Brennan)
+ * Fix: Improved accessibility fixes for `main`, `header` and `footer` elements in the admin page layout (Mitchel Cabuloy)
+ * Fix: Prevent version number from obscuring long settings menus (Naomi Morduch Toubman)
+ * Fix: Admin views using TemplateResponse now respect the user's language setting (Jacob Topp-Mugglestone)
+ * Fix: Fixed incorrect language code for Japanese in language setting dropdown (Tomonori Tanabe)
+
+
+2.8.2 (04.05.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: CVE-2020-11037 - avoid potential timing attack on password-protected private pages (Thibaud Colas)
+
+
+2.8.1 (14.04.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: CVE-2020-11001 - prevent XSS attack via page revision comparison view (Vlad Gerasimenko, Matt Westcott)
+
+
+2.8 (03.02.2020)
 ~~~~~~~~~~~~~~~~
 
  * Django 3.0 support (Matt Westcott, Mads Jensen)
+ * Improved page locking to give editors exclusive edit access (Karl Hobley, Jacob Topp-Mugglestone)
  * Removed support for Django 2.0
  * Removed leftover Python 2.x compatibility code (Sergey Fedoseev)
  * Combine flake8 configurations (Sergey Fedoseev)
- * Improved diffing behavior for text fields (Aliosha Padovani)
+ * Improve diffing behavior for text fields (Aliosha Padovani)
  * Improve contrast of disabled inputs (Nick Smith)
  * Added `get_document_model_string` function (Andrey Smirnov)
  * Added support for Cloudflare API tokens for frontend cache invalidation (Tom Usher)
  * Cloudflare frontend cache invalidation requests are now sent in chunks of 30 to fit within API limits (Tom Usher)
- * Added `ancestors` field to pages endpoint in admin API (Karl Hobley)
+ * Added `ancestors` field to the pages endpoint in admin API (Karl Hobley)
  * Removed Django admin management of `Page` & `Site` models (Andreas Bernacca)
  * Cleaned up Django docs URLs in documentation (Pete Andrew)
  * Add StreamFieldPanel to available panel types in documentation (Dan Swain)
- * Add {{ block.super }} example to ModelAdmin customisation in documentation (Dan Swain)
+ * Add `{{ block.super }}` example to ModelAdmin customisation in documentation (Dan Swain)
  * Add ability to filter image index by a tag (Benedikt Willi)
- * Add formal support for nested InlinePanels (Matt Westcott)
+ * Add partial experimental support for nested InlinePanels (Matt Westcott, Sam Costigan, Andy Chosak, Scott Cranfill)
  * Added cache control headers when serving documents (Johannes Vogel)
+ * Use `sensitive_post_parameters` on password reset form (Dan Braghis)
+ * Add `WAGTAILEMBEDS_RESPONSIVE_HTML` setting to remove automatic addition of `responsive-object` around embeds (Kalob Taulien)
  * Fix: Rename documents listing column 'uploaded' to 'created' (LB (Ben Johnston))
- * Fix: Submenu items longer then the page height are no longer broken by the submenu footer (Igor van Spengen)
  * Fix: Unbundle the l18n library as it was bundled to avoid installation errors which have been resolved (Matt Westcott)
  * Fix: Prevent error when comparing pages that reference a model with a custom primary key (Fidel Ramos)
  * Fix: Moved `get_document_model` location so it can be imported when Models are not yet loaded (Andrey Smirnov)
- * Fix: Fixed incorrect HTML escaping of Jinja2 form templates for StructBlocks (Brady Moe)
+ * Fix: Use correct HTML escaping of Jinja2 form templates for StructBlocks (Brady Moe)
  * Fix: All templates with wagtailsettings and modeladmin now use `block.super` for `extra_js` & `extra_css` (Timothy Bautista)
- * Fix: Layout issue when using FieldRowPanel with a heading (Andreas Bernacca)
- * Fix: `file_size` and `file_hash` not updated when Document file changed (Andreas Bernacca)
+ * Fix: Layout issue when using `FieldRowPanel` with a heading (Andreas Bernacca)
+ * Fix: `file_size` and `file_hash` now updated when Document file changed (Andreas Bernacca)
  * Fix: Fixed order of URLs in project template so that static / media URLs are not blocked (Nick Smith)
- * Fix: Added verbose_name_plural for form submission model (Janneke Janssen)
+ * Fix: Added `verbose_name_plural` to form submission model (Janneke Janssen)
+ * Fix: Prevent `update_index` failures and incorrect front-end rendering on blank `TableBlock` (Carlo Ascani)
+ * Fix: Dropdown initialisation on the search page after AJAX call (Eric Sherman)
+ * Fix: Make sure all modal chooser search results correspond to the latest search by cancelling previous requests (Esper Kuijs)
+
+
+2.7.4 (20.07.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: CVE-2020-15118 - prevent HTML injection through form field help text (Timothy Bautista, Matt Westcott)
+ * Fix: Expand Pillow dependency range to include 7.x (Harris Lapiroff, Matt Westcott)
+
+
+2.7.3 (04.05.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: CVE-2020-11037 - avoid potential timing attack on password-protected private pages (Thibaud Colas)
+
+
+2.7.2 (14.04.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: CVE-2020-11001 - prevent XSS attack via page revision comparison view (Vlad Gerasimenko, Matt Westcott)
+
+
+2.7.1 (08.01.2020)
+~~~~~~~~~~~~~~~~~~
+
+ * Fix: Management command startup checks under `ManifestStaticFilesStorage` no longer fail if `collectstatic` has not been run first (Alex Tomkins)
 
 
 2.7 LTS (06.11.2019)
@@ -100,7 +379,7 @@ Changelog
 2.6.1 (05.08.2019)
 ~~~~~~~~~~~~~~~~~~
 
- * Fix: Prevent Javascript errors caused by unescaped quote characters in translation strings (Matt Westcott)
+ * Fix: Prevent JavaScript errors caused by unescaped quote characters in translation strings (Matt Westcott)
 
 
 2.6 (01.08.2019)
@@ -151,7 +430,7 @@ Changelog
  * Fix: Avoid rendering entire form in EditHandler's `repr` method (Alex Tomkins)
  * Fix: Add empty alt attributes to HTML output of Embedly and oEmbed embed finders (Andreas Bernacca)
  * Fix: Add empty alt attributes to all images in the CMS admin (Andreas Bernacca)
- * Fix: Make URL generator preview image alt translateable (Thibaud Colas)
+ * Fix: Make URL generator preview image alt translatable (Thibaud Colas)
  * Fix: Clear pending AJAX request if error occurs on page chooser (Matt Westcott)
  * Fix: Prevent text from overlapping in focal point editing UI (Beth Menzies)
  * Fix: Screen readers now announce "Dashboard" for the main nav’s logo link instead of Wagtail’s version number (Thibaud Colas)
@@ -228,7 +507,7 @@ Changelog
  * Fix: `send_mail` now correctly uses the `html_message` kwarg for HTML messages (Tiago Requeijo)
  * Fix: Page copying no longer allowed if page model has reached its `max_count` (Andy Babic)
  * Fix: Don't show page type on page chooser button when multiple types are allowed (Thijs Kramer)
- * Fix: Make sure page chooser search results correspond to the latest search by canceling previous requests (Esper Kuijs)
+ * Fix: Make sure page chooser search results correspond to the latest search by cancelling previous requests (Esper Kuijs)
  * Fix: Inform user when moving a page from one parent to another where there is an already existing page with the same slug (Casper Timmers)
  * Fix: User add/edit forms now support form widgets with JS/CSS media (Damian Grinwis)
  * Fix: Rich text processing now preserves non-breaking spaces instead of converting them to normal spaces (Wesley van Lee)
@@ -247,6 +526,7 @@ Changelog
 ~~~~~~~~~~~~~~~~
 
  * Added support for Python 3.7 (Matt Westcott)
+ * Removed support for Django 1.11 (Matt Westcott)
  * Added `max_count` option on page models to limit the number of pages of a particular type that can be created (Dan Braghis)
  * Document and image choosers now show the document / image's collection (Alejandro Garza, Janneke Janssen)
  * Added new "Welcome to your Wagtail site" Starter Page when using wagtail start command (Timothy Allen, Scott Cranfill)
@@ -336,7 +616,7 @@ Changelog
  * Increased max length of redirect URL field to 255 (Michael Harrison)
  * Added documentation for new JS/CSS media files association with Draftail feature definitions (Ed Henderson)
  * Added accessible colour contrast guidelines to the style guide (Catherine Farman)
- * Admin modal views no longer rely on Javascript `eval()`, for better CSP compliance (Matt Westcott)
+ * Admin modal views no longer rely on JavaScript `eval()`, for better CSP compliance (Matt Westcott)
  * Update editor guide for embeds and documents in rich text (Kevin Howbrook)
  * Improved performance of sitemap generation (Michael van Tellingen, Bertrand Bordage)
  * Added an internal API for autocomplete (Karl Hobley, Bertrand Bordage)
@@ -1310,7 +1590,7 @@ Changelog
  * Fix: The wagtailimages module is now compatible with remote storage backends that do not allow reopening closed files
  * Fix: Search no longer crashes when auto-indexing a model that doesn't have an id field (Scot Hacker)
  * Fix: The `wagtailfrontendcache` module's HTTP backend has been rewritten to reliably direct requests to the configured cache hostname
- * Fix: Resizing single pixel images with the "fill" filter no longer raises "ZeroDivisionError" or "tile cannot extend outside image"
+ * Fix: Resizing single pixel images with the "fill" filter no longer raises `ZeroDivisionError` or "tile cannot extend outside image"
  * Fix: The queryset returned from `search` operations when using the database search backend now correctly preserves additional properties of the original query, such as `prefetch_related` / `select_related`
  * Fix: Responses from the external image URL generator are correctly marked as streaming and will no longer fail when used with Django's cache middleware
  * Fix: Page copy now works with pages that use multiple inheritance (Jordi Joan)
@@ -1330,7 +1610,7 @@ Changelog
  * Removed dependency on libsass (Tim Heap)
  * Users without usernames can now be created and edited in the admin interface (Tim Heap)
  * Added update notifications
- * Javascript includes in the admin backend have been moved to the HTML header, to accommodate form widgets that render inline scripts that depend on libraries such as jQuery
+ * JavaScript includes in the admin backend have been moved to the HTML header, to accommodate form widgets that render inline scripts that depend on libraries such as jQuery
  * Improvements to the layout of the admin menu footer.
  * Menu items of custom apps are now highlighted when being used (Josh Barr)
  * Added thousands separator for counters on dashboard
@@ -1364,7 +1644,7 @@ Changelog
  * The Page model now records the date/time that a page was first published, as the field `first_published_at`
  * Increased the maximum length of a page slug from 50 to 255 characters
  * Plain text fields in the page editor now use auto-expanding text areas
- * Date / time pickers now consistently use times without seconds, to prevent Javascript behaviour glitches when focusing / unfocusing fields
+ * Date / time pickers now consistently use times without seconds, to prevent JavaScript behaviour glitches when focusing / unfocusing fields
  * Added hooks `register_rich_text_embed_handler` and `register_rich_text_link_handler` for customising link / embed handling within rich text fields
  * Added hook `construct_homepage_summary_items` for customising the site summary panel on the admin homepage
  * No longer automatically tries to use Celery for sending notification emails
@@ -1384,7 +1664,7 @@ Changelog
 ~~~~~~~~~~~~~~~~~~~
 * Fix: When copying a page, IDs of child objects within page revision records were not remapped to the new objects; this would cause those objects to be lost from the original page when editing the new one
 * Fix: Search no longer crashes when auto-indexing a model that doesn't have an id field (Scot Hacker)
-* Fix: Resizing single pixel images with the "fill" filter no longer raises "ZeroDivisionError" or "tile cannot extend outside image"
+* Fix: Resizing single pixel images with the "fill" filter no longer raises `ZeroDivisionError` or "tile cannot extend outside image"
 
 
 0.8.9 (16.09.2015)
@@ -1600,7 +1880,7 @@ Changelog
  * Added a new datetime picker widget
  * Added styleguide (mainly for wagtail developers)
  * Aesthetic improvements to preview experience
- * 'image' tag now accepts extra keyword arguments to be output as attributes on the img tag
+ * 'image' tag now accepts extra keyword arguments to be output as attributes on the `<img>` tag
  * Login screen redirects to dashboard if user is already logged in
  * Renamed some template tag libraries
  * Any extra arguments given to serve are now passed through to get_context and get_template
@@ -1675,7 +1955,7 @@ Changelog
  * Internationalisation of the admin backend
  * Translations for Bulgarian, Catalan, Chinese, Galician, German, Greek, Polish, Romanian and Spanish. Partial translations for Basque and Mongolian.
  * Stylesheets ported from Less to Sass, to eliminate dependency on an external CSS compiler
- * Coffeescript replaced by vanilla Javascript
+ * Coffeescript replaced by vanilla JavaScript
  * OEmbed supported as an alternative backend for wagtailembeds, eliminating dependency on Embedly
  * Database supported as an alternative search backend, eliminating dependency on ElasticSearch
  * Background tasks now fall back on in-process handling if Celery is not available (also eliminating Redis as a dependency)

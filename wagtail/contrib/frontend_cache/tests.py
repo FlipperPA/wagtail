@@ -2,6 +2,7 @@ from unittest import mock
 from urllib.error import HTTPError, URLError
 
 import requests
+
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -300,15 +301,46 @@ class TestCachePurgingSignals(TestCase):
 
     @override_settings(ROOT_URLCONF='wagtail.tests.urls_multilang',
                        LANGUAGE_CODE='en',
-                       WAGTAILFRONTENDCACHE_LANGUAGES=['en'])
+                       WAGTAILFRONTENDCACHE_LANGUAGES=['en', 'fr', 'pt-br'])
     def test_purge_on_publish_in_multilang_env(self):
-        from django.conf import settings
         PURGED_URLS[:] = []  # reset PURGED_URLS to the empty list
         page = EventIndex.objects.get(url_path='/home/events/')
         page.save_revision().publish()
-        self.assertEqual(len(PURGED_URLS), len(settings.WAGTAILFRONTENDCACHE_LANGUAGES) * 2)
-        for isocode, description in settings.WAGTAILFRONTENDCACHE_LANGUAGES:
-            self.assertIn('http://localhost/%s/events/' % isocode, PURGED_URLS)
+
+        self.assertEqual(PURGED_URLS, [
+            'http://localhost/en/events/',
+            'http://localhost/en/events/past/',
+            'http://localhost/fr/events/',
+            'http://localhost/fr/events/past/',
+            'http://localhost/pt-br/events/',
+            'http://localhost/pt-br/events/past/',
+        ])
+
+    @override_settings(ROOT_URLCONF='wagtail.tests.urls_multilang',
+                       LANGUAGE_CODE='en',
+                       WAGTAIL_I18N_ENABLED=True,
+                       WAGTAIL_CONTENT_LANGUAGES=[('en', 'English'), ('fr', 'French')])
+    def test_purge_on_publish_with_i18n_enabled(self):
+        PURGED_URLS[:] = []  # reset PURGED_URLS to the empty list
+        page = EventIndex.objects.get(url_path='/home/events/')
+        page.save_revision().publish()
+
+        self.assertEqual(PURGED_URLS, [
+            'http://localhost/en/events/',
+            'http://localhost/en/events/past/',
+            'http://localhost/fr/events/',
+            'http://localhost/fr/events/past/',
+        ])
+
+    @override_settings(ROOT_URLCONF='wagtail.tests.urls_multilang',
+                       LANGUAGE_CODE='en',
+                       WAGTAIL_CONTENT_LANGUAGES=[('en', 'English'), ('fr', 'French')])
+    def test_purge_on_publish_without_i18n_enabled(self):
+        # It should ignore WAGTAIL_CONTENT_LANGUAGES as WAGTAIL_I18N_ENABLED isn't set
+        PURGED_URLS[:] = []  # reset PURGED_URLS to the empty list
+        page = EventIndex.objects.get(url_path='/home/events/')
+        page.save_revision().publish()
+        self.assertEqual(PURGED_URLS, ['http://localhost/en/events/', 'http://localhost/en/events/past/'])
 
 
 class TestPurgeBatchClass(TestCase):

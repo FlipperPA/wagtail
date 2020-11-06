@@ -78,17 +78,16 @@ def serve(request, document_id, document_filename):
         # Use wagtail.utils.sendfile to serve the file;
         # this provides support for mimetypes, if-modified-since and django-sendfile backends
 
-        if hasattr(settings, 'SENDFILE_BACKEND'):
-            return sendfile(request, local_path, attachment=True, attachment_filename=doc.filename)
-        else:
+        sendfile_opts = {
+            'attachment': (doc.content_disposition != 'inline'),
+            'attachment_filename': doc.filename,
+            'mimetype': doc.content_type,
+        }
+        if not hasattr(settings, 'SENDFILE_BACKEND'):
             # Fallback to streaming backend if user hasn't specified SENDFILE_BACKEND
-            return sendfile(
-                request,
-                local_path,
-                attachment=True,
-                attachment_filename=doc.filename,
-                backend=sendfile_streaming_backend.sendfile
-            )
+            sendfile_opts['backend'] = sendfile_streaming_backend.sendfile
+
+        return sendfile(request, local_path, **sendfile_opts)
 
     else:
 
@@ -99,9 +98,11 @@ def serve(request, document_id, document_filename):
         # as a StreamingHttpResponse
 
         wrapper = FileWrapper(doc.file)
-        response = StreamingHttpResponse(wrapper, content_type='application/octet-stream')
+        response = StreamingHttpResponse(wrapper, doc.content_type)
 
-        response['Content-Disposition'] = 'attachment; filename=%s' % doc.filename
+        # set filename and filename* to handle non-ascii characters in filename
+        # see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+        response['Content-Disposition'] = doc.content_disposition
 
         # FIXME: storage backends are not guaranteed to implement 'size'
         response['Content-Length'] = doc.file.size

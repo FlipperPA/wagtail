@@ -29,7 +29,7 @@ Using StreamField
         author = models.CharField(max_length=255)
         date = models.DateField("Post date")
         body = StreamField([
-            ('heading', blocks.CharBlock(classname="full title")),
+            ('heading', blocks.CharBlock(form_classname="full title")),
             ('paragraph', blocks.RichTextBlock()),
             ('image', ImageChooserBlock()),
         ])
@@ -90,19 +90,27 @@ A single-line text input. The following keyword arguments are accepted:
 ``validators``
   A list of validation functions for the field (see `Django Validators <https://docs.djangoproject.com/en/stable/ref/validators/>`__).
 
+``form_classname``
+  A value to add to the form field's ``class`` attribute when rendered on the page editing form.
+
+.. versionchanged:: 2.11
+
+    The ``class`` attribute was previously set via the keyword argument ``classname``.
+
+
 TextBlock
 ~~~~~~~~~
 
 ``wagtail.core.blocks.TextBlock``
 
-A multi-line text input. As with ``CharBlock``, the keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text`` and ``validators`` are accepted.
+A multi-line text input. As with ``CharBlock``, the keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text``, ``validators`` and ``form_classname`` are accepted.
 
 EmailBlock
 ~~~~~~~~~~
 
 ``wagtail.core.blocks.EmailBlock``
 
-A single-line email input that validates that the email is a valid Email Address. The keyword arguments ``required`` (default: True), ``help_text`` and ``validators`` are accepted.
+A single-line email input that validates that the email is a valid Email Address. The keyword arguments ``required`` (default: True), ``help_text``, ``validators`` and ``form_classname`` are accepted.
 
 For an example of ``EmailBlock`` in use, see :ref:`streamfield_personblock_example`
 
@@ -111,7 +119,7 @@ IntegerBlock
 
 ``wagtail.core.blocks.IntegerBlock``
 
-A single-line integer input that validates that the integer is a valid whole number. The keyword arguments ``required`` (default: True), ``max_value``, ``min_value``, ``help_text`` and ``validators`` are accepted.
+A single-line integer input that validates that the integer is a valid whole number. The keyword arguments ``required`` (default: True), ``max_value``, ``min_value``, ``help_text``, ``validators`` and ``form_classname`` are accepted.
 
 For an example of ``IntegerBlock`` in use, see :ref:`streamfield_personblock_example`
 
@@ -120,14 +128,14 @@ FloatBlock
 
 ``wagtail.core.blocks.FloatBlock``
 
-A single-line Float input that validates that the value is a valid floating point number. The keyword arguments ``required`` (default: True), ``max_value``, ``min_value`` and ``validators``  are accepted.
+A single-line Float input that validates that the value is a valid floating point number. The keyword arguments ``required`` (default: True), ``max_value``, ``min_value``, ``validators`` and ``form_classname`` are accepted.
 
 DecimalBlock
 ~~~~~~~~~~~~
 
 ``wagtail.core.blocks.DecimalBlock``
 
-A single-line decimal input that validates that the value is a valid decimal number. The keyword arguments ``required`` (default: True), ``help_text``, ``max_value``, ``min_value``, ``max_digits``, ``decimal_places`` and ``validators`` are accepted.
+A single-line decimal input that validates that the value is a valid decimal number. The keyword arguments ``required`` (default: True), ``help_text``, ``max_value``, ``min_value``, ``max_digits``, ``decimal_places``, ``validators`` and ``form_classname`` are accepted.
 
 For an example of ``DecimalBlock`` in use, see :ref:`streamfield_personblock_example`
 
@@ -144,28 +152,28 @@ A single-line text input that validates a string against a regex expression. The
         'invalid': "Not a valid library card number."
     })
 
-The keyword arguments ``regex``, ``help_text``, ``required`` (default: True), ``max_length``, ``min_length``, ``error_messages`` and ``validators`` are accepted.
+The keyword arguments ``regex``, ``error_messages``, ``help_text``, ``required`` (default: True), ``max_length``, ``min_length``, ``validators`` and ``form_classname`` are accepted.
 
 URLBlock
 ~~~~~~~~
 
 ``wagtail.core.blocks.URLBlock``
 
-A single-line text input that validates that the string is a valid URL. The keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text`` and ``validators`` are accepted.
+A single-line text input that validates that the string is a valid URL. The keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text``, ``validators`` and ``form_classname`` are accepted.
 
 BooleanBlock
 ~~~~~~~~~~~~
 
 ``wagtail.core.blocks.BooleanBlock``
 
-A checkbox. The keyword arguments ``required`` and ``help_text`` are accepted. As with Django's ``BooleanField``, a value of ``required=True`` (the default) indicates that the checkbox must be ticked in order to proceed. For a checkbox that can be ticked or unticked, you must explicitly pass in ``required=False``.
+A checkbox. The keyword arguments ``required``, ``help_text`` and ``form_classname`` are accepted. As with Django's ``BooleanField``, a value of ``required=True`` (the default) indicates that the checkbox must be ticked in order to proceed. For a checkbox that can be ticked or unticked, you must explicitly pass in ``required=False``.
 
 DateBlock
 ~~~~~~~~~
 
 ``wagtail.core.blocks.DateBlock``
 
-A date picker. The keyword arguments ``required`` (default: True), ``help_text``, ``format`` and ``validators`` are accepted.
+A date picker. The keyword arguments ``required`` (default: True), ``help_text``, ``validators``, ``form_classname`` and ``format`` are accepted.
 
 ``format`` (default: None)
   Date format. This must be one of the recognised formats listed in the `DATE_INPUT_FORMATS <https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DATE_INPUT_FORMATS>`_ setting. If not specified Wagtail will use ``WAGTAIL_DATE_FORMAT`` setting with fallback to '%Y-%m-%d'.
@@ -175,14 +183,14 @@ TimeBlock
 
 ``wagtail.core.blocks.TimeBlock``
 
-A time picker. The keyword arguments ``required`` (default: True), ``help_text`` and ``validators`` are accepted.
+A time picker. The keyword arguments ``required`` (default: True), ``help_text``, ``validators`` and ``form_classname`` are accepted.
 
 DateTimeBlock
 ~~~~~~~~~~~~~
 
 ``wagtail.core.blocks.DateTimeBlock``
 
-A combined date / time picker. The keyword arguments ``required`` (default: True), ``help_text``, ``format`` and ``validators`` are accepted.
+A combined date / time picker. The keyword arguments ``required`` (default: True), ``help_text``, ``format``, ``validators`` and ``form_classname`` are accepted.
 
 ``format`` (default: None)
   Date format. This must be one of the recognised formats listed in the `DATETIME_INPUT_FORMATS <https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DATETIME_INPUT_FORMATS>`_ setting. If not specified Wagtail will use ``WAGTAIL_DATETIME_FORMAT`` setting with fallback to '%Y-%m-%d %H:%M'.
@@ -192,7 +200,7 @@ RichTextBlock
 
 ``wagtail.core.blocks.RichTextBlock``
 
-A WYSIWYG editor for creating formatted text including links, bold / italics etc. The keyword arguments ``required`` (default: True), ``help_text``, ``validators``, ``editor`` and ``features`` are accepted.
+A WYSIWYG editor for creating formatted text including links, bold / italics etc. The keyword arguments ``required`` (default: True), ``help_text``, ``validators``, ``form_classname``, ``editor`` and ``features`` are accepted.
 
 ``editor`` (default: ``default``)
   The rich text editor to be used (see :ref:`WAGTAILADMIN_RICH_TEXT_EDITORS`).
@@ -206,7 +214,7 @@ RawHTMLBlock
 
 ``wagtail.core.blocks.RawHTMLBlock``
 
-A text area for entering raw HTML which will be rendered unescaped in the page output. The keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text`` and ``validators`` are accepted.
+A text area for entering raw HTML which will be rendered unescaped in the page output. The keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text``, ``validators`` and ``form_classname`` are accepted.
 
 .. WARNING::
    When this block is in use, there is nothing to prevent editors from inserting malicious scripts into the page, including scripts that would allow the editor to acquire administrator privileges when another administrator views the page. Do not use this block unless your editors are fully trusted.
@@ -216,7 +224,7 @@ BlockQuoteBlock
 
 ``wagtail.core.blocks.BlockQuoteBlock``
 
-A text field, the contents of which will be wrapped in an HTML `<blockquote>` tag pair. The keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text`` and ``validators`` are accepted.
+A text field, the contents of which will be wrapped in an HTML `<blockquote>` tag pair. The keyword arguments ``required`` (default: True), ``max_length``, ``min_length``, ``help_text``, ``validators`` and ``form_classname`` are accepted.
 
 
 ChoiceBlock
@@ -237,6 +245,12 @@ A dropdown select box for choosing from a list of choices. The following keyword
 
 ``validators``
   A list of validation functions for the field (see `Django Validators <https://docs.djangoproject.com/en/stable/ref/validators/>`__).
+
+``form_classname``
+  A value to add to the form field's ``class`` attribute when rendered on the page editing form.
+
+``widget``
+  The form widget to render the field with (see `Django Widgets <https://docs.djangoproject.com/en/stable/ref/forms/widgets/>`__).
 
 ``ChoiceBlock`` can also be subclassed to produce a reusable block with the same list of choices everywhere it is used. For example, a block definition such as:
 
@@ -263,6 +277,35 @@ could be rewritten as a subclass of ChoiceBlock:
 
 
 ``StreamField`` definitions can then refer to ``DrinksChoiceBlock()`` in place of the full ``ChoiceBlock`` definition. Note that this only works when ``choices`` is a fixed list, not a callable.
+
+
+.. _streamfield_multiplechoiceblock:
+
+MultipleChoiceBlock
+~~~~~~~~~~~~~~~~~~~
+
+``wagtail.core.blocks.MultipleChoiceBlock``
+
+A multiple select box for choosing from a list of choices. The following keyword arguments are accepted:
+
+``choices``
+  A list of choices, in any format accepted by Django's :attr:`~django.db.models.Field.choices` parameter for model fields, or a callable returning such a list.
+
+``required`` (default: True)
+  If true, the field cannot be left blank.
+
+``help_text``
+  Help text to display alongside the field.
+
+``validators``
+  A list of validation functions for the field (see `Django Validators <https://docs.djangoproject.com/en/stable/ref/validators/>`__).
+
+``form_classname``
+  A value to add to the form field's ``class`` attribute when rendered on the page editing form.
+
+``widget``
+  The form widget to render the field with (see `Django Widgets <https://docs.djangoproject.com/en/stable/ref/forms/widgets/>`__).
+
 
 PageChooserBlock
 ~~~~~~~~~~~~~~~~
@@ -382,7 +425,7 @@ This defines ``PersonBlock()`` as a block type that can be re-used as many times
 .. code-block:: python
 
     body = StreamField([
-        ('heading', blocks.CharBlock(classname="full title")),
+        ('heading', blocks.CharBlock(form_classname="full title")),
         ('paragraph', blocks.RichTextBlock()),
         ('image', ImageChooserBlock()),
         ('person', PersonBlock()),
@@ -414,6 +457,28 @@ Any block type is valid as the sub-block type, including structural types:
         ('ingredient', blocks.CharBlock()),
         ('amount', blocks.CharBlock(required=False)),
     ])))
+
+To customise the class name of a ``ListBlock`` as it appears in the page editor, you can specify a ``form_classname`` attribute as a keyword argument to the ``ListBlock`` constructor:
+
+.. code-block:: python
+    :emphasize-lines: 4
+
+    ('ingredients_list', blocks.ListBlock(blocks.StructBlock([
+        ('ingredient', blocks.CharBlock()),
+        ('amount', blocks.CharBlock(required=False)),
+    ]), form_classname='ingredients-list'))
+
+Alternatively, you can add ``form_classname`` in a subclass's ``Meta``:
+
+.. code-block:: python
+    :emphasize-lines: 6
+
+    class IngredientsListBlock(blocks.ListBlock):
+        ingredient = blocks.CharBlock()
+        amount = blocks.CharBlock(required=False)
+
+        class Meta:
+            form_classname = 'ingredients-list'
 
 
 StreamBlock
@@ -474,6 +539,27 @@ Since ``StreamField`` accepts an instance of ``StreamBlock`` as a parameter, in 
 
 ``block_counts``
   Specifies the minimum and maximum number of each block type, as a dictionary mapping block names to dicts with (optional) ``min_num`` and ``max_num`` fields.
+
+``form_classname``
+  Customise the class name added to a ``StreamBlock`` form in the page editor.
+
+    .. code-block:: python
+        :emphasize-lines: 4
+
+        ('event_promotions', blocks.StreamBlock([
+            ('hashtag', blocks.CharBlock()),
+            ('post_date', blocks.DateBlock()),
+        ], form_classname='event-promotions'))
+
+    .. code-block:: python
+        :emphasize-lines: 6
+
+        class EventPromotionsBlock(blocks.StreamBlock):
+            hashtag = blocks.CharBlock()
+            post_date = blocks.DateBlock()
+
+            class Meta:
+                form_classname = 'event-promotions'
 
 
 .. _streamfield_personblock_example:

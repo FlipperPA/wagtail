@@ -1,6 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
-
 from modelcluster.fields import ParentalKey
 from taggit.models import Tag
 
@@ -13,7 +12,7 @@ from wagtail.core.models import Page
 
 
 def get_object_usage(obj):
-    "Returns a queryset of pages that link to a particular object"
+    """Returns a queryset of pages that link to a particular object"""
 
     pages = Page.objects.none()
 

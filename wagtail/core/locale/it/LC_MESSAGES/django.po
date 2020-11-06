@@ -8,12 +8,13 @@
 # Giacomo Ghizzani <giacomo.ghz@gmail.com>, 2015-2018
 # giammi <gian-maria.daffre@giammi.org>, 2018
 # Sandro Badalamenti <sandro@mailinator.com>, 2019
+# Stefano Marchetto <airbatum@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 17:59+0100\n"
-"PO-Revision-Date: 2019-10-16 17:05+0000\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:36+0000\n"
 "Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: Italian (http://www.transifex.com/torchbox/wagtail/language/"
 "it/)\n"
@@ -156,6 +157,9 @@ msgstr "scaduto"
 msgid "locked"
 msgstr "bloccato"
 
+msgid "locked by"
+msgstr "bloccato da"
+
 msgid "first published at"
 msgstr "primo pubblicato a"
 
@@ -237,8 +241,8 @@ msgstr "Elimina pagine con sottopagine"
 msgid "Lock"
 msgstr "Blocca"
 
-msgid "Lock/unlock any page"
-msgstr "Blocca/sblocca ogni pagina"
+msgid "Unlock"
+msgstr "Sblocca"
 
 msgid "group"
 msgstr "gruppo"

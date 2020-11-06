@@ -37,15 +37,10 @@ Middleware (``settings.py``)
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 
-    'wagtail.core.middleware.SiteMiddleware',
-
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
   ]
 
-Wagtail requires several common Django middleware modules to work and cover basic security. Wagtail provides its own middleware to cover these tasks:
-
-``SiteMiddleware``
-  Wagtail routes pre-defined hosts to pages within the Wagtail tree using this middleware.
+Wagtail depends on the default set of Django middleware modules, to cover basic security and functionality such as login sessions. One additional middleware module is provided:
 
 ``RedirectMiddleware``
   Wagtail provides a simple interface for adding arbitrary redirects to your site and this module makes it happen.
@@ -88,34 +83,37 @@ Wagtail requires several Django app modules, third-party apps, and defines sever
 Wagtail Apps
 ------------
 
-``wagtailcore``
+``wagtail.core``
   The core functionality of Wagtail, such as the ``Page`` class, the Wagtail tree, and model fields.
 
-``wagtailadmin``
+``wagtail.admin``
   The administration interface for Wagtail, including page edit handlers.
 
-``wagtaildocs``
+``wagtail.documents``
   The Wagtail document content type.
 
-``wagtailsnippets``
+``wagtail.snippets``
   Editing interface for non-Page models and objects. See :ref:`Snippets`.
 
-``wagtailusers``
+``wagtail.users``
   User editing interface.
 
-``wagtailimages``
+``wagtail.images``
   The Wagtail image content type.
 
-``wagtailembeds``
+``wagtail.embeds``
   Module governing oEmbed and Embedly content in Wagtail rich text fields. See :ref:`inserting_videos`.
 
-``wagtailsearch``
+``wagtail.search``
   Search framework for Page content. See :ref:`wagtailsearch`.
 
-``wagtailredirects``
+``wagtail.sites``
+  Management UI for Wagtail sites.
+
+``wagtail.contrib.redirects``
   Admin interface for creating arbitrary redirects on your site.
 
-``wagtailforms``
+``wagtail.contrib.forms``
   Models for creating forms on your pages and viewing submissions. See :ref:`form_builder`.
 
 
@@ -145,10 +143,10 @@ URL Patterns
   from wagtail.documents import urls as wagtaildocs_urls
 
   urlpatterns = [
-      re_path(r'^django-admin/', include(admin.site.urls)),
+      path('django-admin/', admin.site.urls),
 
-      re_path(r'^admin/', include(wagtailadmin_urls)),
-      re_path(r'^documents/', include(wagtaildocs_urls)),
+      path('admin/', include(wagtailadmin_urls)),
+      path('documents/', include(wagtaildocs_urls)),
 
       # Optional URL for including your own vanilla Django urls/views
       re_path(r'', include('myapp.urls')),
@@ -225,7 +223,6 @@ These two files should reside in your project directory (``myproject/myproject/`
       'django.middleware.clickjacking.XFrameOptionsMiddleware',
       'django.middleware.security.SecurityMiddleware',
 
-      'wagtail.core.middleware.SiteMiddleware',
       'wagtail.contrib.redirects.middleware.RedirectMiddleware',
   ]
 
@@ -354,7 +351,7 @@ These two files should reside in your project directory (``myproject/myproject/`
   # Replace the search backend
   #WAGTAILSEARCH_BACKENDS = {
   #  'default': {
-  #    'BACKEND': 'wagtail.search.backends.elasticsearch2',
+  #    'BACKEND': 'wagtail.search.backends.elasticsearch5',
   #    'INDEX': 'myapp'
   #  }
   #}
@@ -374,7 +371,7 @@ These two files should reside in your project directory (``myproject/myproject/`
 
 .. code-block:: python
 
-  from django.conf.urls import include, re_path
+  from django.urls import include, path, re_path
   from django.conf.urls.static import static
   from django.views.generic.base import RedirectView
   from django.contrib import admin
@@ -387,10 +384,10 @@ These two files should reside in your project directory (``myproject/myproject/`
 
 
   urlpatterns = [
-      re_path(r'^django-admin/', include(admin.site.urls)),
+      path('django-admin/', admin.site.urls),
 
-      re_path(r'^admin/', include(wagtailadmin_urls)),
-      re_path(r'^documents/', include(wagtaildocs_urls)),
+      path('admin/', include(wagtailadmin_urls)),
+      path('documents/', include(wagtaildocs_urls)),
 
       # For anything not caught by a more specific rule above, hand over to
       # Wagtail's serving mechanism
@@ -404,5 +401,5 @@ These two files should reside in your project directory (``myproject/myproject/`
       urlpatterns += staticfiles_urlpatterns() # tell gunicorn where static files are in dev mode
       urlpatterns += static(settings.MEDIA_URL + 'images/', document_root=os.path.join(settings.MEDIA_ROOT, 'images'))
       urlpatterns += [
-          re_path(r'^favicon\.ico$', RedirectView.as_view(url=settings.STATIC_URL + 'myapp/images/favicon.ico'))
+          path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'myapp/images/favicon.ico'))
       ]

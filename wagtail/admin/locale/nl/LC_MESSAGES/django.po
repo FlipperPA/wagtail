@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-10-16 17:04+0000\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:36+0000\n"
 "Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/torchbox/wagtail/language/"
 "nl/)\n"
@@ -58,6 +58,9 @@ msgstr "Geen"
 msgid "Scheduled publishing"
 msgstr "Geplande publicatie"
 
+msgid "Privacy"
+msgstr "Privacy"
+
 msgid "Common page configuration"
 msgstr "Algemene pagina-instellingen"
 
@@ -69,6 +72,12 @@ msgstr "Eigenschappen"
 
 msgid "Settings"
 msgstr "Instellingen"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Title"
+msgstr "Titel"
 
 msgid "Enter password"
 msgstr "Voer wachtwoord in"
@@ -159,62 +168,8 @@ msgstr "Dit veld is verplicht"
 msgid "Please select at least one group."
 msgstr "Selecteer minimaal één groep."
 
-msgid "January"
-msgstr "januari"
-
-msgid "February"
-msgstr "februari"
-
-msgid "March"
-msgstr "maart"
-
-msgid "April"
-msgstr "april"
-
-msgid "May"
-msgstr "mei"
-
-msgid "June"
-msgstr "juni"
-
-msgid "July"
-msgstr "juli"
-
-msgid "August"
-msgstr "augustus"
-
-msgid "September"
-msgstr "september"
-
-msgid "October"
-msgstr "oktober"
-
-msgid "November"
-msgstr "november"
-
-msgid "December"
-msgstr "december"
-
-msgid "Sun"
-msgstr "Zo"
-
-msgid "Mon"
-msgstr "Ma"
-
-msgid "Tue"
-msgstr "Di"
-
-msgid "Wed"
-msgstr "Wo"
-
-msgid "Thu"
-msgstr "Do"
-
-msgid "Fri"
-msgstr "Vr"
-
-msgid "Sat"
-msgstr "Za"
+msgid "Edit"
+msgstr "Wijzigen"
 
 msgid "Account"
 msgstr "Account"
@@ -322,9 +277,6 @@ msgstr "U kunt de privacyvoorkeuren wijzigen op:"
 msgid "Save"
 msgstr "Opslaan"
 
-msgid "Privacy"
-msgstr "Privacy"
-
 msgid "Public"
 msgstr "Publiekelijk"
 
@@ -348,11 +300,17 @@ msgstr ""
 "Dit is uw dashboard waarop nuttige informatie zal worden getoond over "
 "content die u gemaakt heeft."
 
+msgid "Edit this page"
+msgstr "Wijzig deze pagina"
+
+msgid "Draft"
+msgstr "Concept"
+
+msgid "Live"
+msgstr "Live"
+
 msgid "Pages awaiting moderation"
 msgstr "Pagina's wachtend op goedkeuring"
-
-msgid "Title"
-msgstr "Titel"
 
 msgid "Parent"
 msgstr "Parent"
@@ -363,17 +321,11 @@ msgstr "Type"
 msgid "Edited"
 msgstr "Gewijzigd"
 
-msgid "Edit this page"
-msgstr "Wijzig deze pagina"
-
 msgid "Approve"
 msgstr "Goedkeuren"
 
 msgid "Reject"
 msgstr "Afwijzen"
-
-msgid "Edit"
-msgstr "Wijzigen"
 
 msgid "Preview"
 msgstr "Voorbeeld bekijken"
@@ -381,17 +333,8 @@ msgstr "Voorbeeld bekijken"
 msgid "Your most recent edits"
 msgstr "Uw meest recente wijzigingen"
 
-msgid "Date"
-msgstr "Datum"
-
 msgid "Status"
 msgstr "Status"
-
-msgid "Draft"
-msgstr "Concept"
-
-msgid "Live"
-msgstr "Live"
 
 msgid "Site summary"
 msgstr "Site samenvatting"
@@ -452,18 +395,6 @@ msgid "Privacy changes apply to all children of this page too."
 msgstr ""
 "Privacywijzigingen hebben ook effect op alle onderliggende pagina's van deze "
 "pagina."
-
-msgid "Edit lock"
-msgstr "Wijzig vergrendeling"
-
-msgid "Locked"
-msgstr "Vergrendeld"
-
-msgid "Unlocked"
-msgstr "Ontgrendeld"
-
-msgid "Publish this revision"
-msgstr "Publiceer deze revisie"
 
 msgid "Save draft"
 msgstr "Concept opslaan"
@@ -563,21 +494,6 @@ msgid "Editing %(page_type)s: %(title)s"
 msgstr "Bewerk %(page_type)s: %(title)s"
 
 #, python-format
-msgid "Editing %(page_type)s <span>%(title)s</span>"
-msgstr "Bewerk %(page_type)s <span>%(title)s</span>"
-
-#, python-format
-msgid "Last modified: %(last_mod)s"
-msgstr "Laatste gewijzigd: %(last_mod)s"
-
-#, python-format
-msgid "by %(modified_by)s"
-msgstr "door %(modified_by)s"
-
-msgid "Revisions"
-msgstr "Revisies"
-
-#, python-format
 msgid "Exploring %(title)s"
 msgstr "%(title)s aan het bekijken"
 
@@ -654,9 +570,6 @@ msgstr "Vergelijk %(title)s"
 msgid "Comparing"
 msgstr "Vegelijken"
 
-msgid "View revisions"
-msgstr "Bekijk revisies"
-
 msgid "Fields"
 msgstr "Velden"
 
@@ -693,12 +606,6 @@ msgstr[1] ""
 "\n"
 "Er zijn %(counter)s overeenkomende pagina's"
 
-#, python-format
-msgid "Sorry, no pages match <em>\"%(query_string)s\"</em>"
-msgstr ""
-"Sorry, geen enkele pagina komt overeen met de zoekterm <em>\"%(query_string)s"
-"\"</em>"
-
 msgid "Enter a search term above"
 msgstr "Voer hierboven een zoekterm in"
 
@@ -707,6 +614,9 @@ msgstr "Geen enkele pagina maakt gebruik van"
 
 msgid "Collection"
 msgstr "Collectie"
+
+msgid "Locked"
+msgstr "Vergrendeld"
 
 #, python-format
 msgid "Page %(page_num)s of %(total_pages)s."
@@ -727,20 +637,15 @@ msgstr "Uitloggen"
 msgid "Other searches"
 msgstr "Andere zoekresultaten"
 
-msgid ""
-"You are using an <strong>outdated</strong> browser not supported by this "
-"software. Please <a href=\"http://browsehappy.com/\">upgrade your browser</"
-"a>."
-msgstr ""
-"U gebruikt een <strong>verouderde</strong> browser die niet ondersteund "
-"wordt door deze sofware. <a href=\"http://browsehappy.com/\">upgrade uw "
-"browser</a> a.u.b."
-
 msgid "Go to Wagtail admin interface"
 msgstr "Ga naar de Wagtail beheer interface"
 
 msgid "Add a child page"
 msgstr "Voeg een onderliggende pagina toe"
+
+#, python-format
+msgid "by %(modified_by)s"
+msgstr "door %(modified_by)s"
 
 msgid "Your password has been changed successfully!"
 msgstr "Uw wachtwoord is succesvol gewijzigd."
@@ -748,8 +653,20 @@ msgstr "Uw wachtwoord is succesvol gewijzigd."
 msgid "Collections"
 msgstr "Collecties"
 
+msgid "Page '{0}' and {1} subpages copied."
+msgstr "Pagina '{0}' en {1} onderliggende pagina's gekopieerd."
+
+msgid "Page '{0}' copied."
+msgstr "Pagina '{0}' gekopieerd."
+
+msgid "View draft"
+msgstr "Bekijk ontwerp"
+
 msgid "View live"
 msgstr "Bekijk live"
+
+msgid "Page '{0}' created."
+msgstr "Pagina '{0}' aangemaakt."
 
 msgid "Page '{0}' created and published."
 msgstr "Pagina '{0}' aangemaakt en gepubliceerd."
@@ -757,14 +674,14 @@ msgstr "Pagina '{0}' aangemaakt en gepubliceerd."
 msgid "Page '{0}' created and submitted for moderation."
 msgstr "Pagina '{0}' aangemaakt en ter goedkeuring aangeboden."
 
-msgid "View draft"
-msgstr "Bekijk ontwerp"
-
-msgid "Page '{0}' created."
-msgstr "Pagina '{0}' aangemaakt."
-
 msgid "The page could not be created due to validation errors"
 msgstr "Deze pagina kon niet aangemaakt worden vanwege validatiefouten"
+
+msgid "Page '{0}' deleted."
+msgstr "Pagina '{0}' verwijderd"
+
+msgid "This page is currently awaiting moderation"
+msgstr "Deze pagina wacht momenteel op goedkeuring"
 
 msgid "The page could not be saved as it is locked"
 msgstr "De pagina kan niet worden opgeslagen omdat deze is vergrendeld"
@@ -772,23 +689,8 @@ msgstr "De pagina kan niet worden opgeslagen omdat deze is vergrendeld"
 msgid "The page could not be saved due to validation errors"
 msgstr "Deze pagina kon niet opgeslagen worden vanwege validatiefouten"
 
-msgid "This page is currently awaiting moderation"
-msgstr "Deze pagina wacht momenteel op goedkeuring"
-
-msgid "Page '{0}' deleted."
-msgstr "Pagina '{0}' verwijderd"
-
-msgid "Page '{0}' unpublished."
-msgstr "Page '{0}' publicatie ongedaan gemaakt."
-
-msgid "Page '{0}' moved."
-msgstr "Pagina '{0}' verplaatst."
-
-msgid "Page '{0}' and {1} subpages copied."
-msgstr "Pagina '{0}' en {1} onderliggende pagina's gekopieerd."
-
-msgid "Page '{0}' copied."
-msgstr "Pagina '{0}' gekopieerd."
+msgid "Page '{0}' is now unlocked."
+msgstr "Pagina '{0}' is ontgrendeld."
 
 msgid "The page '{0}' is not currently awaiting moderation."
 msgstr "The page '{0}' is momenteel niet op goedkeuring aan het wachten."
@@ -799,11 +701,11 @@ msgstr "Pagina '{0}' gepubliceerd."
 msgid "Page '{0}' rejected for publication."
 msgstr "Pagina '{0}' is afgewezen voor publicatie."
 
-msgid "Page '{0}' is now locked."
-msgstr "Pagina '{0}' is vergrendeld."
+msgid "Page '{0}' moved."
+msgstr "Pagina '{0}' verplaatst."
 
-msgid "Page '{0}' is now unlocked."
-msgstr "Pagina '{0}' is ontgrendeld."
+msgid "Page '{0}' unpublished."
+msgstr "Page '{0}' publicatie ongedaan gemaakt."
 
 msgid "Change the password you use to log in."
 msgstr "Wijzig uw wachtwoord om in te loggen."

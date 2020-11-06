@@ -100,6 +100,50 @@ Database fields
 
             To set the global default for all pages, set ``Page.show_in_menus_default = True`` once where you first import the ``Page`` model.
 
+    .. attribute:: locked
+
+        (boolean)
+
+        When set to ``True``, the Wagtail editor will not allow any users to edit
+        the content of the page.
+
+        If ``locked_by`` is also set, only that user can edit the page.
+
+    .. attribute:: locked_by
+
+       (foreign key to user model)
+
+        The user who has currently locked the page. Only this user can edit the page.
+
+        If this is ``None`` when ``locked`` is ``True``, nobody can edit the page.
+
+    .. attribute:: locked_at
+
+        (date/time)
+
+        The date/time when the page was locked.
+
+    .. attribute:: alias_of
+
+        (foreign key to another page)
+
+        If set, this page is an alias of the page referenced in this field.
+
+    .. attribute:: locale
+
+        (foreign key to Locale)
+
+        This foreign key links to the ``Locale`` object that represents the page language.
+
+    .. attribute:: translation_key
+
+        (uuid)
+
+        A UUID that is shared between translations of a page. These are randomly generated
+        when a new page is created and copied when a translation of a page is made.
+
+        A translation_key value can only be used on one page in each locale.
+
 
 Methods and properties
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -112,10 +156,13 @@ In addition to the model fields provided, ``Page`` has many properties and metho
 
 
 .. class:: Page
+    :noindex:
 
     .. autoattribute:: specific
 
     .. autoattribute:: specific_class
+
+    .. autoattribute:: cached_content_type
 
     .. automethod:: get_url
 
@@ -130,6 +177,10 @@ In addition to the model fields provided, ``Page`` has many properties and metho
     .. automethod:: route
 
     .. automethod:: serve
+
+    .. autoattribute:: context_object_name
+
+        Custom name for page instance in page's ``Context``.
 
     .. automethod:: get_context
 
@@ -149,20 +200,34 @@ In addition to the model fields provided, ``Page`` has many properties and metho
 
     .. automethod:: get_siblings
 
+    .. automethod:: get_translations
+
+    .. automethod:: get_translation
+
+    .. automethod:: get_translation_or_none
+
+    .. automethod:: has_translation
+
+    .. automethod:: copy_for_translation
+
+    .. autoattribute:: localized
+
+    .. autoattribute:: localized_draft
+
     .. attribute:: search_fields
 
         A list of fields to be indexed by the search engine. See Search docs :ref:`wagtailsearch_indexing_fields`
 
     .. attribute:: subpage_types
 
-        A whitelist of page models which can be created as children of this page type. For example, a ``BlogIndex`` page might allow a ``BlogPage`` as a child, but not a ``JobPage``:
+        A list of page models which can be created as children of this page type. For example, a ``BlogIndex`` page might allow a ``BlogPage`` as a child, but not a ``JobPage``:
 
         .. code-block:: python
 
             class BlogIndex(Page):
                 subpage_types = ['mysite.BlogPage', 'mysite.BlogArchivePage']
 
-        The creation of child pages can be blocked altogether for a given page by setting it's subpage_types attribute to an empty array:
+        The creation of child pages can be blocked altogether for a given page by setting its subpage_types attribute to an empty array:
 
         .. code-block:: python
 
@@ -171,7 +236,7 @@ In addition to the model fields provided, ``Page`` has many properties and metho
 
     .. attribute:: parent_page_types
 
-        A whitelist of page models which are allowed as parent page types. For example, a ``BlogPage`` may only allow itself to be created below the ``BlogIndex`` page:
+        A list of page models which are allowed as parent page types. For example, a ``BlogPage`` may only allow itself to be created below the ``BlogIndex`` page:
 
         .. code-block:: python
 
@@ -228,6 +293,24 @@ In addition to the model fields provided, ``Page`` has many properties and metho
 
     .. automethod:: with_content_json
 
+    .. automethod:: save
+
+    .. automethod:: create_alias
+
+    .. automethod:: update_aliases
+
+    .. autoattribute:: has_workflow
+
+    .. automethod:: get_workflow
+
+    .. autoattribute:: workflow_in_progress
+
+    .. autoattribute:: current_workflow_state
+
+    .. autoattribute:: current_workflow_task_state
+
+    .. autoattribute:: current_workflow_task
+
 .. _site-model-ref:
 
 ``Site``
@@ -235,7 +318,8 @@ In addition to the model fields provided, ``Page`` has many properties and metho
 
 The ``Site`` model is useful for multi-site installations as it allows an administrator to configure which part of the tree to use for each hostname that the server responds on.
 
-This configuration is used by the :class:`~wagtail.core.middleware.SiteMiddleware` middleware class which checks each request against this configuration and appends the Site object to the Django request object.
+The :meth:`~wagtail.core.models.Site.find_for_request` function returns the Site object that will handle the given HTTP request.
+
 
 Database fields
 ~~~~~~~~~~~~~~~
@@ -286,6 +370,7 @@ Methods and properties
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: Site
+    :noindex:
 
     .. automethod:: find_for_request
 
@@ -300,6 +385,87 @@ Methods and properties
          - Everything else will use the ``http://`` scheme and the port will be appended to the end of the hostname (eg. ``http://mysite.com:8000/``)
 
     .. automethod:: get_site_root_paths
+
+
+Locale
+======
+
+The ``Locale`` model defines the set of languages and/or locales that can be used on a site.
+Each ``Locale`` record corresponds to a "language code" defined in the :ref:`wagtail_content_languages_setting` setting.
+
+Wagtail will initially set up one ``Locale`` to act as the default language for all existing content.
+This first locale will automatically pick the value from ``WAGTAIL_CONTENT_LANGUAGES`` that most closely matches the site primary language code defined in ``LANGUAGE_CODE``.
+If the primary language code is changed later, Wagtail will **not** automatically create a new ``Locale`` record or update an existing one.
+
+Before internationalisation is enabled, all pages use this primary ``Locale`` record.
+This is to satisfy the database constraints, and makes it easier to switch internationalisation on at a later date.
+
+Changing ``WAGTAIL_CONTENT_LANGUAGES``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Languages can be added or removed from ``WAGTAIL_CONTENT_LANGUAGES`` over time.
+
+Before removing an option from ``WAGTAIL_CONTENT_LANGUAGES``, it's important that the ``Locale``
+record is updated to a use a different content language or is deleted.
+Any ``Locale`` instances that have invalid content languages are automatically filtered out from all
+database queries making them unable to be edited or viewed.
+
+Methods and properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: Locale
+    :noindex:
+
+    .. autoattribute:: language_code
+
+    .. automethod:: get_default
+
+    .. automethod:: get_active
+
+    .. automethod:: get_display_name
+
+
+Translatable Mixin
+==================
+
+``TranslatableMixin`` is an abstract model that can be added to any non-page Django model to make it translatable.
+Pages already include this mixin, so there is no need to add it.
+
+Methods and properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+The ``locale`` and ``translation_key`` fields have a unique key constraint to prevent the object being translated into a language more than once.
+
+.. class:: TranslatableMixin
+    :noindex:
+
+    .. attribute:: locale
+
+        (Foreign Key to :class:`~wagtail.core.models.Locale`)
+
+        For pages, this defaults to the locale of the parent page.
+
+    .. attribute:: translation_key
+
+        (uuid)
+
+        A UUID that is randomly generated whenever a new model instance is created.
+        This is shared with all translations of that instance so can be used for querying translations.
+
+    .. automethod:: get_translations
+
+    .. automethod:: get_translation
+
+    .. automethod:: get_translation_or_none
+
+    .. automethod:: has_translation
+
+    .. automethod:: copy_for_translation
+
+    .. automethod:: get_translation_model
+
+    .. autoattribute:: localized
+
 
 .. _page-revision-model-ref:
 
@@ -349,6 +515,7 @@ Managers
 ~~~~~~~~
 
 .. class:: PageRevision
+    :noindex:
 
     .. attribute:: objects
 
@@ -374,6 +541,7 @@ Methods and properties
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: PageRevision
+    :noindex:
 
     .. automethod:: as_page_object
 
@@ -442,3 +610,420 @@ Database fields
     .. attribute:: sort_order
 
         (number)
+
+
+``Workflow``
+============
+
+Workflows represent sequences of tasks which much be approved for an action to be performed on a page - typically publication.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: Workflow
+
+    .. attribute:: name
+
+        (text)
+
+        Human-readable name of the workflow.
+
+    .. attribute:: active
+
+        (boolean)
+
+        Whether or not the workflow is active: active workflows can be added to pages, and started. Inactive workflows cannot.
+
+
+Methods and properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: Workflow
+    :noindex:
+
+    .. automethod:: start
+
+    .. autoattribute:: tasks
+
+    .. automethod:: deactivate
+
+    .. automethod:: all_pages
+
+
+``WorkflowState``
+=================
+
+Workflow states represent the status of a started workflow on a page.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: WorkflowState
+
+    .. attribute:: page
+
+        (foreign key to ``Page``)
+
+        The page on which the workflow has been started
+
+    .. attribute:: workflow
+
+        (foreign key to ``Workflow``)
+
+        The workflow whose state the ``WorkflowState`` represents
+
+    .. attribute:: status
+
+        (text)
+
+        The current status of the workflow (options are ``WorkflowState.STATUS_CHOICES``)
+
+    .. attribute:: created_at
+
+        (date/time)
+
+        When this instance of ``WorkflowState`` was created - when the workflow was started
+
+    .. attribute:: requested_by
+
+        (foreign key to user model)
+
+        The user who started this workflow
+
+    .. attribute:: current_task_state
+
+        (foreign key to ``TaskState``)
+
+        The ``TaskState`` model for the task the workflow is currently at: either completing (if in progress) or the final task state (if finished)
+
+Methods and properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: WorkflowState
+    :noindex:
+
+    .. attribute:: STATUS_CHOICES
+
+        A tuple of the possible options for the ``status`` field, and their verbose names. Options are ``STATUS_IN_PROGRESS``, ``STATUS_APPROVED``,
+        ``STATUS_CANCELLED`` and ``STATUS_NEEDS_CHANGES``.
+
+    .. automethod:: update
+
+    .. automethod:: get_next_task
+
+    .. automethod:: cancel
+
+    .. automethod:: finish
+
+    .. automethod:: resume
+
+    .. automethod:: copy_approved_task_states_to_revision
+
+    .. automethod:: all_tasks_with_status
+
+    .. automethod:: revisions
+
+
+``Task``
+========
+
+Tasks represent stages in a workflow which must be approved for the workflow to complete successfully.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: Task
+
+    .. attribute:: name
+
+        (text)
+
+        Human-readable name of the task.
+
+    .. attribute:: active
+
+        (boolean)
+
+        Whether or not the task is active: active workflows can be added to workflows, and started. Inactive workflows cannot, and are skipped when in
+        an existing workflow.
+
+    .. attribute:: content_type
+
+        (foreign key to ``django.contrib.contenttypes.models.ContentType``)
+
+        A foreign key to the :class:`~django.contrib.contenttypes.models.ContentType` object that represents the specific model of this task.
+
+
+Methods and properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: Task
+    :noindex:
+
+    .. autoattribute:: workflows
+
+    .. autoattribute:: active_workflows
+
+    .. attribute:: task_state_class
+
+        The specific task state class to generate to store state information for this task. If not specified, this will be ``TaskState``.
+
+    .. automethod:: get_verbose_name
+
+    .. autoattribute:: specific
+
+    .. automethod:: start
+
+    .. automethod:: on_action
+
+    .. automethod:: user_can_access_editor
+
+    .. automethod:: user_can_lock
+
+    .. automethod:: user_can_unlock
+
+    .. automethod:: page_locked_for_user
+
+    .. automethod:: get_actions
+
+    .. automethod:: get_task_states_user_can_moderate
+
+    .. automethod:: deactivate
+
+    .. automethod:: get_form_for_action
+
+    .. automethod:: get_template_for_action
+
+    .. automethod:: get_description
+
+
+``TaskState``
+=============
+
+Task states store state information about the progress of a task on a particular page revision.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: TaskState
+
+    .. attribute:: workflow_state
+
+        (foreign key to ``WorkflowState``)
+
+        The workflow state which started this task state.
+
+    .. attribute:: page revision
+
+        (foreign key to ``PageRevision``)
+
+        The page revision this task state was created on.
+
+    .. attribute:: task
+
+        (foreign key to ``Task``)
+
+        The task that this task state is storing state information for.
+
+    .. attribute:: status
+
+        (text)
+
+        The completion status of the task on this revision. Options are available in ``TaskState.STATUS_CHOICES``)
+
+    .. attribute:: content_type
+
+        (foreign key to ``django.contrib.contenttypes.models.ContentType``)
+
+        A foreign key to the :class:`~django.contrib.contenttypes.models.ContentType` object that represents the specific model of this task.
+
+    .. attribute:: started_at
+
+        (date/time)
+
+        When this task state was created.
+
+    .. attribute:: finished_at
+
+        (date/time)
+
+        When this task state was cancelled, rejected, or approved.
+
+    .. attribute:: finished_by
+
+        (foreign key to user model)
+
+        The user who completed (cancelled, rejected, approved) the task.
+
+    .. attribute:: comment
+
+        (text)
+
+        A text comment, typically added by a user when the task is completed.
+
+
+Methods and properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: TaskState
+    :noindex:
+
+    .. attribute:: STATUS_CHOICES
+
+        A tuple of the possible options for the ``status`` field, and their verbose names. Options are ``STATUS_IN_PROGRESS``, ``STATUS_APPROVED``,
+        ``STATUS_CANCELLED``, ``STATUS_REJECTED`` and ``STATUS_SKIPPED``.
+
+    .. attribute:: exclude_fields_in_copy
+
+        A list of fields not to copy when the ``TaskState.copy()`` method is called.
+
+    .. autoattribute:: specific
+
+    .. automethod:: approve
+
+    .. automethod:: reject
+
+    .. autoattribute:: task_type_started_at
+
+    .. automethod:: cancel
+
+    .. automethod:: copy
+
+    .. automethod:: get_comment
+
+``WorkflowTask``
+================
+
+Represents the ordering of a task in a specific workflow.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: WorkflowTask
+
+    .. attribute:: workflow
+
+        (foreign key to ``Workflow``)
+
+    .. attribute:: task
+
+        (foreign key to ``Task``)
+
+    .. attribute:: sort_order
+
+        (number)
+
+        The ordering of the task in the workflow.
+
+``WorkflowPage``
+================
+
+Represents the assignment of a workflow to a page and its descendants.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: WorkflowPage
+
+    .. attribute:: workflow
+
+        (foreign key to ``Workflow``)
+
+    .. attribute:: page
+
+        (foreign key to ``Page``)
+
+``BaseLogEntry``
+================
+
+An abstract base class that represents a record of an action performed on an object.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: BaseLogEntry
+
+    .. attribute:: content_type
+
+        (foreign key to ``django.contrib.contenttypes.models.ContentType``)
+
+        A foreign key to the :class:`~django.contrib.contenttypes.models.ContentType` object that represents the specific model of this model.
+
+    .. attribute:: label
+
+        (text)
+
+        The object title at the time of the entry creation
+
+        Note: Wagtail will attempt to use ``get_admin_display_title`` or the string representation of the object passed to :meth:`~LogEntryManger.log_action`
+
+    .. attribute:: user
+
+        (foreign key to user model)
+
+        A foreign key to the user that triggered the action.
+
+    .. attribute:: data_json
+
+        (text)
+
+        The JSON representation of any additional details for each action.
+        e.g. source page id and title when copying from a page. Or workflow id/name and next step id/name on a workflow transition
+
+    .. attribute:: timestamp
+
+        (date/time)
+
+        The date/time when the entry was created.
+
+    .. attribute:: content_changed
+
+        (boolean)
+
+        A boolean that can set to ``True`` when the content has changed.
+
+    .. attribute:: deleted
+
+        (boolean)
+
+        A boolean that can set to ``True`` when the object is deleted. Used to filter entries in the Site History report.
+
+Methods and properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: BaseLogEntry
+    :noindex:
+
+    .. autoattribute:: user_display_name
+
+    .. autoattribute:: data
+
+    .. autoattribute:: comment
+
+    .. autoattribute:: object_verbose_name
+
+    .. automethod:: object_id
+
+
+
+``PageLogEntry``
+================
+
+Represents a record of an action performed on an :class:`Page`, subclasses :class:`BaseLogEntry`.
+
+Database fields
+~~~~~~~~~~~~~~~
+
+.. class:: PageLogEntry
+
+    .. attribute:: page
+
+        (foreign key to :class:`Page`)
+
+        A foreign key to the page the action is performed on.
+
+    .. attribute:: revision
+
+        (foreign key to :class:`PageRevision`)
+
+        A foreign key to the current page revision.

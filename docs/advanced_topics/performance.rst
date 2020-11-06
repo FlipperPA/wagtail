@@ -30,6 +30,28 @@ We recommend `Redis <https://redis.io/>`_ as a fast, persistent cache. Install R
     }
 
 
+Caching image renditions
+------------------------
+
+If you define a cache named 'renditions' (typically alongside your 'default' cache),
+Wagtail will cache image rendition lookups, which may improve the performance of pages
+which include many images.
+
+.. code-block:: python
+
+    CACHES = {
+        'default': {...},
+        'renditions': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+            'TIMEOUT': 600,
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000
+            }
+        }
+    }
+
+
 Search
 ------
 
@@ -41,13 +63,13 @@ For details on configuring Wagtail for Elasticsearch, see :ref:`wagtailsearch_ba
 Database
 --------
 
-Wagtail is tested on PostgreSQL, SQLite and MySQL. It should work on some third-party database backends as well (Microsoft SQL Server is known to work but currently untested). We recommend PostgreSQL for production use.
+Wagtail is tested on PostgreSQL, SQLite and MySQL. It may work on some third-party database backends as well, but this is not guaranteed. We recommend PostgreSQL for production use.
 
 
 Templates
 ---------
 
-The overhead from reading and compiling templates can add up. In some cases a significant performance improvement can be gained by using :class:`Django's cached template loader <django.template.loaders.cached.Loader>`:
+The overhead from reading and compiling templates adds up. Django wraps its default loaders with :class:`cached template loader <django.template.loaders.cached.Loader>`: which stores the compiled ``Template`` in memory and returns it for subsequent requests. The cached loader is automatically enabled when ``DEBUG`` is ``False``. If you are using custom loaders, update your settings to use it:
 
 .. code-block:: python
 
@@ -59,12 +81,11 @@ The overhead from reading and compiling templates can add up. In some cases a si
                 ('django.template.loaders.cached.Loader', [
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
+                    'path.to.custom.Loader',
                 ]),
             ],
         },
     }]
-
-There is a caveat associated with this loader though. Changes to a template file will not be picked up once it is cached. This means that this loader should *not* be enabled during development.
 
 
 Public users

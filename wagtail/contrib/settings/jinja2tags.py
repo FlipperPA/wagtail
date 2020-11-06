@@ -1,11 +1,13 @@
 from weakref import WeakKeyDictionary
 
 import jinja2
+
 from django.utils.encoding import force_str
 from jinja2.ext import Extension
 
 from wagtail.contrib.settings.registry import registry
 from wagtail.core.models import Site
+
 
 # Settings are cached per template context, to prevent excessive database
 # lookups. The cached settings are disposed of once the template context is no
@@ -60,7 +62,7 @@ def get_setting(context, model_string, use_default_site=False):
     if use_default_site:
         site = Site.objects.get(is_default_site=True)
     elif 'request' in context:
-        site = context['request'].site
+        site = Site.find_for_request(context['request'])
     else:
         raise RuntimeError('No request found in context, and use_default_site '
                            'flag not set')

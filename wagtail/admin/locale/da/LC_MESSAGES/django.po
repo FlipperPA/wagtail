@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-10-16 17:04+0000\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:36+0000\n"
 "Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: Danish (http://www.transifex.com/torchbox/wagtail/language/"
 "da/)\n"
@@ -48,6 +48,9 @@ msgstr "Intet"
 msgid "Scheduled publishing"
 msgstr "Planlagt udgivning"
 
+msgid "Privacy"
+msgstr "Privatliv"
+
 msgid "Common page configuration"
 msgstr "Konfiguration af standardside"
 
@@ -59,6 +62,12 @@ msgstr "Promover"
 
 msgid "Settings"
 msgstr "Indstillinger"
+
+msgid "Date"
+msgstr "Dato"
+
+msgid "Title"
+msgstr "Titel"
 
 msgid "Enter password"
 msgstr "Skriv adgangskode"
@@ -222,6 +231,9 @@ msgstr "Slovakisk"
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
+msgid "Edit"
+msgstr "Rediger"
+
 msgid "Page"
 msgstr "Side"
 
@@ -284,63 +296,6 @@ msgstr "Luk"
 
 msgid "Edit '{title}'"
 msgstr "Rediger '{title}'"
-
-msgid "January"
-msgstr "Januar"
-
-msgid "February"
-msgstr "Februar"
-
-msgid "March"
-msgstr "Marts"
-
-msgid "April"
-msgstr "April"
-
-msgid "May"
-msgstr "Maj"
-
-msgid "June"
-msgstr "Juni"
-
-msgid "July"
-msgstr "Juli"
-
-msgid "August"
-msgstr "August"
-
-msgid "September"
-msgstr "September"
-
-msgid "October"
-msgstr "Oktober"
-
-msgid "November"
-msgstr "November"
-
-msgid "December"
-msgstr "December"
-
-msgid "Sun"
-msgstr "Søn"
-
-msgid "Mon"
-msgstr "Man"
-
-msgid "Tue"
-msgstr "Tir"
-
-msgid "Wed"
-msgstr "Ons"
-
-msgid "Thu"
-msgstr "Tor"
-
-msgid "Fri"
-msgstr "Fre"
-
-msgid "Sat"
-msgstr "Lør"
 
 msgid "Error 404: Page not found"
 msgstr "Fejl 404: Side ikke fundet"
@@ -527,9 +482,6 @@ msgstr ""
 msgid "Save"
 msgstr "Gem"
 
-msgid "Privacy"
-msgstr "Privatliv"
-
 msgid "Public"
 msgstr "Offentlig"
 
@@ -550,8 +502,14 @@ msgstr "Ja, slet"
 msgid "Welcome to the %(site_name)s Wagtail CMS"
 msgstr "Velkommen til %(site_name)s Wagtail CMS"
 
-msgid "Title"
-msgstr "Titel"
+msgid "Edit this page"
+msgstr "Rediger denne side"
+
+msgid "Draft"
+msgstr "Skitse"
+
+msgid "Live"
+msgstr "Live"
 
 msgid "Parent"
 msgstr "Forældre"
@@ -562,39 +520,20 @@ msgstr "Type"
 msgid "Edited"
 msgstr "Redigeret"
 
-msgid "Edit this page"
-msgstr "Rediger denne side"
-
 msgid "Approve"
 msgstr "Godkend"
 
 msgid "Reject"
 msgstr "Afvis"
 
-msgid "Edit"
-msgstr "Rediger"
-
 msgid "Preview"
 msgstr "Forhåndsvis"
-
-#, python-format
-msgid "%(time_period)s ago"
-msgstr "%(time_period)s siden"
 
 msgid "Your most recent edits"
 msgstr "Dine seneste redigeringer"
 
-msgid "Date"
-msgstr "Dato"
-
 msgid "Status"
 msgstr "Status"
-
-msgid "Draft"
-msgstr "Skitse"
-
-msgid "Live"
-msgstr "Live"
 
 msgid "Site summary"
 msgstr "Side opsummering"
@@ -610,11 +549,11 @@ msgstr ""
 msgid "Sign in to Wagtail"
 msgstr "Log ind i Wagtail"
 
-msgid "Forgotten it?"
-msgstr "Glemt det?"
-
 msgid "Signing in…"
 msgstr "Logger ind..."
+
+msgid "Forgotten it?"
+msgstr "Glemt det?"
 
 #, python-format
 msgid "The page \"%(title)s\" has been approved."
@@ -643,17 +582,8 @@ msgstr "Side privatliv"
 msgid "This page has been made private by a parent page."
 msgstr "Denne side er blevet lavet privat af en forældreside."
 
-msgid "Locked"
-msgstr "Låst"
-
-msgid "Unlocked"
-msgstr "Ulåst"
-
 msgid "Publishing…"
 msgstr "Udgiver..."
-
-msgid "Publish this revision"
-msgstr "Udgiv denne revision"
 
 msgid "Saving…"
 msgstr "Gemmer..."
@@ -793,20 +723,15 @@ msgstr "Denne side har ugemte ændringer."
 msgid "Editing %(page_type)s: %(title)s"
 msgstr "Redigerer %(page_type)s: %(title)s"
 
-#, python-format
-msgid "Editing %(page_type)s <span>%(title)s</span>"
-msgstr "Redigerer %(page_type)s <span>%(title)s</span>"
+msgid "Live version"
+msgstr "Live version"
+
+msgid "Current draft"
+msgstr "Nuværende skitse"
 
 #, python-format
-msgid "Last modified: %(last_mod)s"
-msgstr "Sidst ændret: %(last_mod)s"
-
-#, python-format
-msgid "by %(modified_by)s"
-msgstr "af %(modified_by)s"
-
-msgid "Revisions"
-msgstr "Revisioner"
+msgid "%(time_period)s ago"
+msgstr "%(time_period)s siden"
 
 #, python-format
 msgid "Exploring %(title)s"
@@ -892,9 +817,6 @@ msgstr "Sammenligner %(title)s"
 msgid "Comparing"
 msgstr "Sammenligner"
 
-msgid "View revisions"
-msgstr "Vis revisioner"
-
 msgid "Fields"
 msgstr "Felter"
 
@@ -945,18 +867,12 @@ msgstr[1] ""
 "%(counter)s felter op.\n"
 "                                                        "
 
-msgid "There are no differences between these two revisions"
-msgstr "Der er ingen forskelle på de to revisioner"
-
 msgctxt "points to a user who created a revision"
 msgid "by"
 msgstr "af"
 
-msgid "Current draft"
-msgstr "Nuværende skitse"
-
-msgid "Live version"
-msgstr "Live version"
+msgid "Locked"
+msgstr "Låst"
 
 msgid "Root"
 msgstr "Rod"
@@ -982,38 +898,15 @@ msgstr "Tilføj en underside"
 msgid "Show in Explorer"
 msgstr "Vis i Udforsker"
 
+#, python-format
+msgid "by %(modified_by)s"
+msgstr "af %(modified_by)s"
+
 msgid "Test"
 msgstr "Test"
 
 msgid "Editing"
 msgstr "Redigerer"
-
-msgid "View live"
-msgstr "Vis live"
-
-msgid "View draft"
-msgstr "Vis skitse"
-
-msgid "Page '{0}' created."
-msgstr "Side  '{0}' lavet."
-
-msgid "Page '{0}' has been published."
-msgstr "Side '{0}' er blevet udgivet."
-
-msgid "Page '{0}' has been submitted for moderation."
-msgstr "Side '{0}' er blivet indsendt til moderation."
-
-msgid "Page '{0}' has been updated."
-msgstr "Side '{0}' er blevet opdateret."
-
-msgid "Page '{0}' deleted."
-msgstr "Side '{0}' slettet."
-
-msgid "Page '{0}' unpublished."
-msgstr "SIde '{0}' afpubliceret."
-
-msgid "Page '{0}' moved."
-msgstr "SIde '{0}' flyttet."
 
 msgid "Page '{0}' and {1} subpages copied."
 msgstr "SIde '{0}' og {1} undersider blev kopieret."
@@ -1021,11 +914,38 @@ msgstr "SIde '{0}' og {1} undersider blev kopieret."
 msgid "Page '{0}' copied."
 msgstr "SIde '{0}' kopieret."
 
+msgid "View draft"
+msgstr "Vis skitse"
+
+msgid "View live"
+msgstr "Vis live"
+
+msgid "Page '{0}' created."
+msgstr "Side  '{0}' lavet."
+
+msgid "Page '{0}' deleted."
+msgstr "Side '{0}' slettet."
+
+msgid "Page '{0}' has been updated."
+msgstr "Side '{0}' er blevet opdateret."
+
+msgid "Page '{0}' has been published."
+msgstr "Side '{0}' er blevet udgivet."
+
+msgid "Page '{0}' has been submitted for moderation."
+msgstr "Side '{0}' er blivet indsendt til moderation."
+
+msgid "Page '{0}' moved."
+msgstr "SIde '{0}' flyttet."
+
 msgid "Earliest"
 msgstr "Tidligste"
 
 msgid "Latest"
 msgstr "Seneste"
+
+msgid "Page '{0}' unpublished."
+msgstr "SIde '{0}' afpubliceret."
 
 msgid "More"
 msgstr "Mere"

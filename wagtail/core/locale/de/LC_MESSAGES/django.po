@@ -4,27 +4,29 @@
 #
 # Translators:
 # Benjamin Thurm, 2018
-# Ettore Atalan <atalanttore@googlemail.com>, 2017
+# Ettore Atalan <atalanttore@googlemail.com>, 2017,2020
 # Vorlif <flori@vorlif.org>, 2015
 # Henrik Kröger <hedwig@riseup.net>, 2016,2018
+# Bohreromir, 2020
 # Johannes Spielmann <j@spielmannsolutions.com>, 2014
 # Matt Westcott <matthew@torchbox.com>, 2015
 # Matthias Martin, 2019
 # Matt Westcott <matthew@torchbox.com>, 2015
 # Max Pfeiffer <max.pfeiffer@alp-phone.ch>, 2015
 # Moritz Pfeiffer <moritz@alp-phone.ch>, 2016-2018
+# Patrick Hebner <hebner.tec@gmail.com>, 2020
 # Peter Dreuw <archandha@gmx.net>, 2019
 # Tammo van Lessen <tvanlessen@gmail.com>, 2015
 # Vorlif <flori@vorlif.org>, 2015,2017
 # Wasilis Mandratzis-Walz, 2015
-# Wasilis Mandratzis-Walz, 2015
+# 79353a696ad19dc202b261b3067b7640_bec941e, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 17:59+0100\n"
-"PO-Revision-Date: 2019-10-18 07:12+0000\n"
-"Last-Translator: Matthias Martin\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:36+0000\n"
+"Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: German (http://www.transifex.com/torchbox/wagtail/language/"
 "de/)\n"
 "MIME-Version: 1.0\n"
@@ -59,6 +61,9 @@ msgstr "Passwort"
 
 msgid "The password you have entered is not correct. Please try again."
 msgstr "Das eingegebene Passwort ist falsch. Bitte versuchen Sie es erneut."
+
+msgid "Comment"
+msgstr "Kommentar"
 
 msgid "hostname"
 msgstr "Hostname"
@@ -99,6 +104,9 @@ msgstr "Webseite"
 
 msgid "sites"
 msgstr "Webseiten"
+
+msgid "default"
+msgstr "Standard"
 
 #, python-format
 msgid ""
@@ -172,6 +180,12 @@ msgstr "abgelaufen"
 msgid "locked"
 msgstr "Gesperrt"
 
+msgid "locked at"
+msgstr "Gesperrt um"
+
+msgid "locked by"
+msgstr "Gesperrt von"
+
 msgid "first published at"
 msgstr "Zuerst publiziert am"
 
@@ -181,17 +195,26 @@ msgstr "zuletzt publiziert am"
 msgid "latest revision created at"
 msgstr "Neuste Revision erstellt am"
 
+msgid "live revision"
+msgstr "Live Revision"
+
 msgid "This slug is already in use"
 msgstr "Dieser Kurztitel wird bereits verwendet"
 
 msgid "scheduled"
 msgstr "geplant"
 
+msgid "in moderation"
+msgstr "in Moderation"
+
 msgid "draft"
 msgstr "Entwurf"
 
 msgid "live + scheduled"
 msgstr "veröffentlicht + geplant"
+
+msgid "live + in moderation"
+msgstr "Live + in Moderation"
 
 msgid "live + draft"
 msgstr "Veröffentlicht + Entwurf"
@@ -253,8 +276,14 @@ msgstr "Seiten inkl. Unterseiten löschen"
 msgid "Lock"
 msgstr "Sperren"
 
-msgid "Lock/unlock any page"
-msgstr "Sperren/Entsperren jeder Seite"
+msgid "Lock/unlock pages you've locked"
+msgstr "Sperren/Entsperren der von Ihnen gesperrten Seiten"
+
+msgid "Unlock"
+msgstr "Entsperren"
+
+msgid "Unlock any page"
+msgstr "Beliebige Seite entsperren"
 
 msgid "group"
 msgstr "Gruppe"
@@ -321,6 +350,47 @@ msgstr "Gruppen Sammlungs-Berechtigung"
 
 msgid "group collection permissions"
 msgstr "Gruppen-Sammlungs-Berechtigungen"
+
+msgid "workflow"
+msgstr "Arbeitsablauf"
+
+msgid "workflow page"
+msgstr "Arbeitsablauf-Seite"
+
+msgid "workflow pages"
+msgstr "Arbeitsablauf-Seiten"
+
+msgid "workflow_tasks"
+msgstr "Aufgaben des Arbeitsablaufes"
+
+msgid "task"
+msgstr "Aufgabe"
+
+msgid "workflow task order"
+msgstr "Reihenfolge der Aufgaben"
+
+msgid "workflow task orders"
+msgstr "Reihenfolgen der Aufgaben"
+
+msgid "active"
+msgstr "aktiv"
+
+msgid ""
+"Active tasks can be added to workflows. Deactivating a task does not remove "
+"it from existing workflows."
+msgstr ""
+"Aktive Aufgaben können zu einem Arbeitsablauf hinzugefügt werden. Die "
+"Deaktivierung einer Aufgabe entfernt diese nicht aus einem bestehenden "
+"Arbeitsablauf."
+
+msgid "tasks"
+msgstr "Aufgaben"
+
+msgid "workflows"
+msgstr "Arbeitsabläufe"
+
+msgid "Workflow '{0}' on Page '{1}': {2}"
+msgstr "Arbeitsablauf ‚{0}‘ auf Seite ‚{1}‘: {2}"
 
 msgid "Log in"
 msgstr "Anmelden"

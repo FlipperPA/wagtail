@@ -21,6 +21,7 @@ global.wagtailConfig = {
   },
   STRINGS: {
     DELETE: 'Delete',
+    EDIT: 'Edit',
     PAGE: 'Page',
     PAGES: 'Pages',
     LOADING: 'Loading…',
@@ -46,6 +47,18 @@ global.wagtailConfig = {
     VIEW_CHILD_PAGES_OF_PAGE: 'View child pages of \'{title}\'',
     PAGE_EXPLORER: 'Page explorer',
   },
+  WAGTAIL_I18N_ENABLED: true,
+  LOCALES: [
+    {
+      code: 'en',
+      display_name: 'English'
+    },
+    {
+      code: 'fr',
+      display_nam: 'French'
+    }
+  ],
+  ACTIVE_LOCALE: 'en'
 };
 
 global.wagtailVersion = '1.6a1';
@@ -60,7 +73,6 @@ global.chooserUrls = {
   externalLinkChooser: '/admin/choose-external-link/',
   imageChooser: '/admin/images/chooser/',
   pageChooser: '/admin/choose-page/',
-  snippetChooser: '/admin/snippets/choose/',
 };
 
 /* use dummy content for onload handlers just so that we can verify that we've chosen the right one */

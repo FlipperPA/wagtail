@@ -10,6 +10,7 @@ class Author(index.Indexed, models.Model):
 
     search_fields = [
         index.SearchField('name'),
+        index.AutocompleteField('name'),
         index.FilterField('date_of_birth'),
     ]
 
@@ -98,7 +99,7 @@ class Novel(Book):
 class ProgrammingGuide(Book):
     programming_language = models.CharField(max_length=255, choices=[
         ('py', "Python"),
-        ('js', "Javascript"),
+        ('js', "JavaScript"),
         ('rs', "Rust"),
     ])
 

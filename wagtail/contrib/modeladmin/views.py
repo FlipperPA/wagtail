@@ -1,13 +1,17 @@
+import warnings
+
 from collections import OrderedDict
 
 from django import forms
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import (
-    get_fields_from_path, label_for_field, lookup_needs_distinct, prepare_lookup_value, quote, unquote)
+    get_fields_from_path, label_for_field, lookup_field, lookup_needs_distinct,
+    prepare_lookup_value, quote, unquote)
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import (
-    FieldDoesNotExist, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied, SuspiciousOperation)
+    FieldDoesNotExist, ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied,
+    SuspiciousOperation)
 from django.core.paginator import InvalidPage, Paginator
 from django.db import models
 from django.db.models.fields.related import ManyToManyField, OneToOneRel
@@ -19,13 +23,15 @@ from django.utils.functional import cached_property
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
 from wagtail.admin import messages
+from wagtail.admin.views.mixins import SpreadsheetExportMixin
 
 from .forms import ParentChooserForm
+
 
 try:
     from django.db.models.sql.constants import QUERY_TERMS
@@ -107,15 +113,26 @@ class WMABaseView(TemplateView):
 
 
 class ModelFormView(WMABaseView, FormView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.edit_handler = self.get_edit_handler()
+
+    def get_form(self):
+        form = super().get_form()
+        self.edit_handler = self.edit_handler.bind_to(form=form)
+        return form
 
     def get_edit_handler(self):
+        instance = self.get_instance()
         edit_handler = self.model_admin.get_edit_handler(
-            instance=self.get_instance(), request=self.request
+            instance=instance, request=self.request
         )
-        return edit_handler.bind_to(model=self.model_admin.model)
+        return edit_handler.bind_to(
+            model=self.model_admin.model, request=self.request, instance=instance
+        )
 
     def get_form_class(self):
-        return self.get_edit_handler().get_form_class()
+        return self.edit_handler.get_form_class()
 
     def get_success_url(self):
         return self.index_url
@@ -135,19 +152,34 @@ class ModelFormView(WMABaseView, FormView):
             js=self.model_admin.get_form_view_extra_js()
         )
 
-    def get_context_data(self, **kwargs):
-        instance = self.get_instance()
-        edit_handler = self.get_edit_handler()
-        form = self.get_form()
-        edit_handler = edit_handler.bind_to(
-            instance=instance, request=self.request, form=form)
+    def get_context_data(self, form=None, **kwargs):
+        if form is None:
+            form = self.get_form()
+
+        prepopulated_fields = self.get_prepopulated_fields(form)
         context = {
             'is_multipart': form.is_multipart(),
-            'edit_handler': edit_handler,
+            'edit_handler': self.edit_handler,
             'form': form,
+            'prepopulated_fields': prepopulated_fields,
         }
         context.update(kwargs)
         return super().get_context_data(**context)
+
+    def get_prepopulated_fields(self, form):
+        fields = []
+        for field_name, dependencies in self.model_admin.get_prepopulated_fields(self.request).items():
+            missing_dependencies = [f"'{f}'" for f in dependencies if f not in form.fields]
+            if len(missing_dependencies) != 0:
+                missing_deps_string = ", ".join(missing_dependencies)
+                dependency_string = "dependencies" if len(missing_dependencies) > 1 else "dependency"
+                warnings.warn(
+                    f"Missing {dependency_string} {missing_deps_string} for prepopulated_field '{field_name}''.",
+                    category=RuntimeWarning
+                )
+            elif field_name in form.fields:
+                fields.append({'field': form[field_name], 'dependencies': [form[f] for f in dependencies]})
+        return fields
 
     def get_success_message(self, instance):
         return _("%(model_name)s '%(instance)s' created.") % {
@@ -176,7 +208,7 @@ class ModelFormView(WMABaseView, FormView):
         messages.validation_error(
             self.request, self.get_error_message(), form
         )
-        return self.render_to_response(self.get_context_data())
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class InstanceSpecificView(WMABaseView):
@@ -212,14 +244,15 @@ class InstanceSpecificView(WMABaseView):
         return super().get_context_data(**context)
 
 
-class IndexView(WMABaseView):
+class IndexView(SpreadsheetExportMixin, WMABaseView):
 
     ORDER_VAR = 'o'
     ORDER_TYPE_VAR = 'ot'
     PAGE_VAR = 'p'
     SEARCH_VAR = 'q'
     ERROR_FLAG = 'e'
-    IGNORED_PARAMS = (ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR)
+    EXPORT_VAR = 'export'
+    IGNORED_PARAMS = (ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, EXPORT_VAR)
 
     # sortable_by is required by the django.contrib.admin.templatetags.admin_list.result_headers
     # template tag as of Django 2.1 - see https://docs.djangoproject.com/en/2.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.sortable_by
@@ -231,12 +264,14 @@ class IndexView(WMABaseView):
         if not self.permission_helper.user_can_list(request.user):
             raise PermissionDenied
 
+        self.list_export = self.model_admin.get_list_export(request)
         self.list_display = self.model_admin.get_list_display(request)
         self.list_filter = self.model_admin.get_list_filter(request)
         self.search_fields = self.model_admin.get_search_fields(request)
         self.items_per_page = self.model_admin.list_per_page
         self.select_related = self.model_admin.list_select_related
         self.search_handler = self.model_admin.get_search_handler(request, self.search_fields)
+        self.export = (request.GET.get(self.EXPORT_VAR))
 
         # Get search parameters from the query string.
         try:
@@ -249,11 +284,39 @@ class IndexView(WMABaseView):
             del self.params[self.PAGE_VAR]
         if self.ERROR_FLAG in self.params:
             del self.params[self.ERROR_FLAG]
+        if self.EXPORT_VAR in self.params:
+            del self.params[self.EXPORT_VAR]
 
         self.query = request.GET.get(self.SEARCH_VAR, '')
+
         self.queryset = self.get_queryset(request)
 
+        if self.export in self.FORMATS:
+            return self.as_spreadsheet(self.queryset, self.export)
+
         return super().dispatch(request, *args, **kwargs)
+
+    def get_filename(self):
+        """ Get filename for exported spreadsheet, without extension """
+        return getattr(self.model_admin, 'export_filename', super().get_filename())
+
+    def get_heading(self, queryset, field):
+        """ Get headings for exported spreadsheet column for the relevant field """
+        heading_override = self.export_headings.get(field)
+        if heading_override:
+            return force_str(heading_override)
+        return force_str(label_for_field(field, model=self.model, model_admin=self.model_admin).title())
+
+    def to_row_dict(self, item):
+        """ Returns an OrderedDict (in the order given by list_export) of the exportable information for a model instance"""
+        row_dict = OrderedDict()
+        for field in self.list_export:
+            f, attr, value = lookup_field(field, item, self.model_admin)
+            if not value:
+                value = getattr(attr, 'empty_value_display', self.model_admin.get_empty_value_display(field))
+            row_dict[field] = value
+
+        return row_dict
 
     @property
     def media(self):
@@ -523,7 +586,6 @@ class IndexView(WMABaseView):
 
         # Apply search results
         return self.get_search_results(request, qs, self.query)
-
 
     def apply_select_related(self, qs):
         if self.select_related is True:

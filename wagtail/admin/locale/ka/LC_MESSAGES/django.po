@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-10-16 17:04+0000\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:36+0000\n"
 "Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: Georgian (http://www.transifex.com/torchbox/wagtail/language/"
 "ka/)\n"
@@ -28,6 +28,12 @@ msgstr "წაშლა"
 msgid "Content"
 msgstr "შიგთავსი"
 
+msgid "Date"
+msgstr "თარიღი"
+
+msgid "Title"
+msgstr "სათაური"
+
 msgid "Enter password"
 msgstr "შეიყვანეთ პაროლი"
 
@@ -43,42 +49,6 @@ msgstr "ძიება"
 
 msgid "Search term"
 msgstr "ძიების ტერმინი"
-
-msgid "January"
-msgstr "იანვარი"
-
-msgid "February"
-msgstr "თებერვალი"
-
-msgid "March"
-msgstr "მარტი"
-
-msgid "April"
-msgstr "აპრილი"
-
-msgid "May"
-msgstr "მაისი"
-
-msgid "June"
-msgstr "ივნისი"
-
-msgid "July"
-msgstr "ივლისი"
-
-msgid "August"
-msgstr "აგვისტო"
-
-msgid "September"
-msgstr "სექტემბერი"
-
-msgid "October"
-msgstr "ოქტომბერი"
-
-msgid "November"
-msgstr "ნოემბერი"
-
-msgid "December"
-msgstr "დეკემბერი"
 
 msgid "Account"
 msgstr "ანგარიში"
@@ -101,17 +71,11 @@ msgstr "შიდა ბმული"
 msgid "Save"
 msgstr "შენახვა"
 
-msgid "Title"
-msgstr "სათაური"
-
-msgid "Type"
-msgstr "ტიპი"
-
 msgid "Edit this page"
 msgstr "ამ გვერდის რედაქტირება"
 
-msgid "Date"
-msgstr "თარიღი"
+msgid "Type"
+msgstr "ტიპი"
 
 msgid "Status"
 msgstr "სტატუსი"

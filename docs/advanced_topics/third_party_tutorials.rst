@@ -6,6 +6,15 @@ Third-party tutorials
     The following list is a collection of tutorials and development notes from third-party developers.
     Some of the older links may not apply to the latest Wagtail versions.
 
+* `Wagtail multi-language and internationalization  <https://dev.to/codista_/wagtail-multi-language-and-internationalization-2gkf>`_ (8 April 2020)
+* `Wagtail SEO Guide <https://www.accordbox.com/blog/wagtail-seo-guide/>`_ (30 March 2020)
+* `Adding a latest-changes list to your Wagtail site <https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/>`_ (27 March 2020)
+* `How to support multi-language in Wagtail CMS <https://www.accordbox.com/blog/how-support-multi-language-wagtail-cms/>`_ (22 February 2020)
+* `Deploying my Wagtail blog to Digital Ocean <https://rosederwelt.com/deploying-my-wagtail-blog-digital-ocean-pt-1/>`_ Part 1 of a 2 part series (29 January 2020)
+* `How to Create and Manage Menus of Wagtail application <https://www.accordbox.com/blog/wagtail-tutorial-12-how-create-and-manage-menus-wagtail-application/>`_ - An updated overview of implementing menus (22 February 2020)
+* `Adding a React component in Wagtail Admin <https://dev.to/lb/adding-a-react-component-in-wagtail-admin-3e>`_ - Shows how to render an interactive timeline of published Pages (30 December 2019)
+* `Wagtail API - how to customize the detail URL <https://dev.to/wagtail/wagtail-api-how-to-customize-the-detail-url-2j3l>`_ (19 December 2020)
+* `How to Add Django Models to the Wagtail Admin <https://dev.to/revsys/how-to-add-django-models-to-the-wagtail-admin-1mdi>`_ (27 August 2019)
 * `How do I Wagtail <https://foundation.mozilla.org/en/docs/how-do-i-wagtail/>`_ - An Editor's Guide for Mozilla's usage of Wagtail (25 April 2019)
 * `Learn Wagtail <https://learnwagtail.com/>`_ - Regular video tutorials about all aspects of Wagtail (1 March 2019)
 * `How to add buttons to ModelAdmin Index View in Wagtail CMS <https://timonweb.com/tutorials/how-to-add-buttons-to-modeladmin-index-view-in-wagtail-cms/>`_ (23 January 2019)
@@ -20,7 +29,7 @@ Third-party tutorials
 * `Wagtail and Azure storage blob containers <https://jossingram.wordpress.com/2017/11/29/wagtail-and-azure-storage-blob-containers/>`_ (29 November 2017)
 * `Building TwilioQuest with Twilio Sync, Django [incl. Wagtail], and Vue.js <https://www.twilio.com/blog/2017/11/building-twilioquest-with-twilio-sync-django-and-vue-js.html>`_ (6 November 2017)
 * `Image upload in wagtail forms <https://posts-by.lb.ee/image-uploads-in-wagtail-forms-3121c9b35d27>`_ (3 September 2017)
-* `Upgrading from Wagtail 1.0 to Wagtail 1.11 <https://www.caktusgroup.com/blog/2017/07/19/upgrading-wagtail/>`_ (19 July 2017) 
+* `Upgrading from Wagtail 1.0 to Wagtail 1.11 <https://www.caktusgroup.com/blog/2017/07/19/upgrading-wagtail/>`_ (19 July 2017)
 * `Wagtail-Multilingual: a simple project to demonstrate how multilingual is implemented <https://github.com/cristovao-alves/Wagtail-Multilingual>`_ (31 January 2017)
 * `Wagtail: 2 Steps for Adding Pages Outside of the CMS <https://www.caktusgroup.com/blog/2016/02/15/wagtail-2-steps-adding-pages-outside-cms/>`_ (15 February 2016)
 * `Adding a Twitter Widget for Wagtail’s new StreamField <https://jossingram.wordpress.com/2015/04/02/adding-a-twitter-widget-for-wagtails-new-streamfield/>`_ (2 April 2015)

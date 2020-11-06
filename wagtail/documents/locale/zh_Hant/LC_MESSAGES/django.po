@@ -3,14 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
+# ongchi <ihcgno@icloud.com>, 2020
+# Ocin Leung, 2020
 # Yeh Yen-Ke <yyken@outlook.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-07-09 13:29+0000\n"
-"Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-11-01 10:02+0000\n"
+"Last-Translator: ongchi <ihcgno@icloud.com>\n"
 "Language-Team: Chinese Traditional (http://www.transifex.com/torchbox/"
 "wagtail/language/zh-Hant/)\n"
 "MIME-Version: 1.0\n"
@@ -131,6 +133,9 @@ msgstr "確定刪除此文件？"
 msgid "Yes, delete"
 msgstr "是，刪除"
 
+msgid "No, don't delete"
+msgstr "否，不刪除"
+
 #, python-format
 msgid "Editing %(title)s"
 msgstr "編輯%(title)s"
@@ -162,8 +167,8 @@ msgstr "文件"
 msgid "Collection"
 msgstr "集合"
 
-msgid "Uploaded"
-msgstr "已上傳"
+msgid "Created"
+msgstr "已創建"
 
 #, python-format
 msgid "%(time_period)s ago"
@@ -204,6 +209,23 @@ msgstr "狀態"
 msgid "Edit this page"
 msgstr "編輯此頁面"
 
+#, python-format
+msgid ""
+"\n"
+"        <span>%(total)s</span> Document <span class=\"visuallyhidden"
+"\">created in %(site_name)s</span>\n"
+"    "
+msgid_plural ""
+"\n"
+"        <span>%(total)s</span> Documents <span class=\"visuallyhidden"
+"\">created in %(site_name)s</span>\n"
+"    "
+msgstr[0] ""
+"\n"
+"        <span>%(total)s</span> 文件 <span class=\"visuallyhidden\">已在 "
+"%(site_name)s創建</span>\n"
+"    "
+
 msgid "Add multiple documents"
 msgstr "新增多個文件"
 
@@ -229,6 +251,9 @@ msgstr ""
 
 msgid "Sorry, upload failed."
 msgstr "對不起，上傳失敗。"
+
+msgid "Document updated."
+msgstr "已更新文件"
 
 msgid "Update"
 msgstr "更新"

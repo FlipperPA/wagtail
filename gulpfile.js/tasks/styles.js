@@ -1,11 +1,12 @@
 var path = require('path');
 var gulp = require('gulp');
-var sass = require('gulp-sass');
-var cssnano = require('gulp-cssnano');
+var sass = require('gulp-dart-sass');
+var postcss = require('gulp-postcss');
+var autoprefixer = require('autoprefixer');
+var cssnano = require('cssnano');
 var sourcemaps = require('gulp-sourcemaps');
 var size = require('gulp-size');
 var config = require('../config');
-var autoprefixer = require('gulp-autoprefixer');
 var simpleCopyTask = require('../lib/simplyCopy');
 var normalizePath = require('../lib/normalize-path');
 var renameSrcToDest = require('../lib/rename-src-to-dest');
@@ -18,16 +19,6 @@ var flatten = function(arrOfArr) {
 };
 
 var autoprefixerConfig = {
-    browsers: [
-      'Firefox ESR',
-      'ie 11',
-      'last 2 Chrome versions',
-      'last 2 ChromeAndroid versions',
-      'last 2 Edge versions',
-      'last 1 Firefox version',
-      'last 2 iOS versions',
-      'last 2 Safari versions',
-    ],
     cascade: false,
 };
 
@@ -38,8 +29,6 @@ var cssnanoConfig = {
     zindex: false,
 };
 
-gulp.task('styles', ['styles:sass', 'styles:css', 'styles:assets']);
-
 // Copy all assets that are not CSS files.
 gulp.task('styles:assets', simpleCopyTask('css/**/!(*.css)'));
 
@@ -49,8 +38,10 @@ gulp.task('styles:css', function() {
     });
 
     return gulp.src(sources, {base: '.'})
-        .pipe(cssnano(cssnanoConfig))
-        .pipe(autoprefixer(autoprefixerConfig))
+        .pipe(postcss([
+          cssnano(cssnanoConfig),
+          autoprefixer(autoprefixerConfig),
+        ]))
         .pipe(renameSrcToDest())
         .pipe(size({ title: 'Vendor CSS' }))
         .pipe(gulp.dest('.'))
@@ -75,8 +66,10 @@ gulp.task('styles:sass', function () {
             includePaths: includePaths,
             outputStyle: 'expanded'
         }).on('error', sass.logError))
-        .pipe(cssnano(cssnanoConfig))
-        .pipe(autoprefixer(autoprefixerConfig))
+        .pipe(postcss([
+          cssnano(cssnanoConfig),
+          autoprefixer(autoprefixerConfig),
+        ]))
         .pipe(size({ title: 'Wagtail CSS' }))
         .pipe(config.isProduction ? gutil.noop() : sourcemaps.write())
         .pipe(gulp.dest(function (file) {
@@ -87,7 +80,9 @@ gulp.task('styles:sass', function () {
                     '/' + config.srcDir + '/',
                     '/' + config.destDir + '/'
                 )
-                .replace('/scss/', '/css/');
+                .replace('/scss', '/css');
         }))
         .on('error', gutil.log);
 });
+
+gulp.task('styles', gulp.series('styles:sass', 'styles:css', 'styles:assets'));

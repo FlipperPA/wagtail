@@ -1,53 +1,59 @@
 import pytz
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
+from django.utils.dates import MONTHS, WEEKDAYS, WEEKDAYS_ABBR
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 
 
 # Wagtail languages with >=90% coverage
 # This list is manually maintained
 WAGTAILADMIN_PROVIDED_LANGUAGES = [
-    ('ar', ugettext_lazy('Arabic')),
-    ('ca', ugettext_lazy('Catalan')),
-    ('cs', ugettext_lazy('Czech')),
-    ('de', ugettext_lazy('German')),
-    ('el', ugettext_lazy('Greek')),
-    ('en', ugettext_lazy('English')),
-    ('es', ugettext_lazy('Spanish')),
-    ('fi', ugettext_lazy('Finnish')),
-    ('fr', ugettext_lazy('French')),
-    ('gl', ugettext_lazy('Galician')),
-    ('hu', ugettext_lazy('Hungarian')),
-    ('id-id', ugettext_lazy('Indonesian')),
-    ('is-is', ugettext_lazy('Icelandic')),
-    ('it', ugettext_lazy('Italian')),
-    ('jp', ugettext_lazy('Japanese')),
-    ('ko', ugettext_lazy('Korean')),
-    ('lt', ugettext_lazy('Lithuanian')),
-    ('mn', ugettext_lazy('Mongolian')),
-    ('nb', ugettext_lazy('Norwegian Bokmål')),
-    ('nl-nl', ugettext_lazy('Netherlands Dutch')),
-    ('fa', ugettext_lazy('Persian')),
-    ('pl', ugettext_lazy('Polish')),
-    ('pt-br', ugettext_lazy('Brazilian Portuguese')),
-    ('pt-pt', ugettext_lazy('Portuguese')),
-    ('ro', ugettext_lazy('Romanian')),
-    ('ru', ugettext_lazy('Russian')),
-    ('sv', ugettext_lazy('Swedish')),
-    ('sk-sk', ugettext_lazy('Slovak')),
-    ('th', ugettext_lazy('Thai')),
-    ('uk', ugettext_lazy('Ukrainian')),
-    ('zh-hans', ugettext_lazy('Chinese (Simplified)')),
-    ('zh-hant', ugettext_lazy('Chinese (Traditional)')),
+    ('ar', gettext_lazy('Arabic')),
+    ('ca', gettext_lazy('Catalan')),
+    ('cs', gettext_lazy('Czech')),
+    ('de', gettext_lazy('German')),
+    ('el', gettext_lazy('Greek')),
+    ('en', gettext_lazy('English')),
+    ('es', gettext_lazy('Spanish')),
+    ('et', gettext_lazy('Estonian')),
+    ('fi', gettext_lazy('Finnish')),
+    ('fr', gettext_lazy('French')),
+    ('gl', gettext_lazy('Galician')),
+    ('hr', gettext_lazy('Croatian')),
+    ('hu', gettext_lazy('Hungarian')),
+    ('id-id', gettext_lazy('Indonesian')),
+    ('is-is', gettext_lazy('Icelandic')),
+    ('it', gettext_lazy('Italian')),
+    ('ja', gettext_lazy('Japanese')),
+    ('ko', gettext_lazy('Korean')),
+    ('lt', gettext_lazy('Lithuanian')),
+    ('mn', gettext_lazy('Mongolian')),
+    ('nb', gettext_lazy('Norwegian Bokmål')),
+    ('nl-nl', gettext_lazy('Netherlands Dutch')),
+    ('fa', gettext_lazy('Persian')),
+    ('pl', gettext_lazy('Polish')),
+    ('pt-br', gettext_lazy('Brazilian Portuguese')),
+    ('pt-pt', gettext_lazy('Portuguese')),
+    ('ro', gettext_lazy('Romanian')),
+    ('ru', gettext_lazy('Russian')),
+    ('sv', gettext_lazy('Swedish')),
+    ('sk-sk', gettext_lazy('Slovak')),
+    ('th', gettext_lazy('Thai')),
+    ('tr', gettext_lazy('Turkish')),
+    ('tr-tr', gettext_lazy('Turkish (Turkey)')),
+    ('uk', gettext_lazy('Ukrainian')),
+    ('zh-hans', gettext_lazy('Chinese (Simplified)')),
+    ('zh-hant', gettext_lazy('Chinese (Traditional)')),
 ]
 
 
-# Translatable strings to be made available to Javascript code
+# Translatable strings to be made available to JavaScript code
 # as the wagtailConfig.STRINGS object
 def get_js_translation_strings():
     return {
         'DELETE': _('Delete'),
+        'EDIT': _('Edit'),
         'PAGE': _('Page'),
         'PAGES': _('Pages'),
         'LOADING': _('Loading…'),
@@ -73,38 +79,12 @@ def get_js_translation_strings():
         'VIEW_CHILD_PAGES_OF_PAGE': _('View child pages of \'{title}\''),
         'PAGE_EXPLORER': _('Page explorer'),
 
-        'MONTHS': [
-            _('January'),
-            _('February'),
-            _('March'),
-            _('April'),
-            _('May'),
-            _('June'),
-            _('July'),
-            _('August'),
-            _('September'),
-            _('October'),
-            _('November'),
-            _('December')
-        ],
-        'WEEKDAYS': [
-            _('Sunday'),
-            _('Monday'),
-            _('Tuesday'),
-            _('Wednesday'),
-            _('Thursday'),
-            _('Friday'),
-            _('Saturday')
-        ],
-        'WEEKDAYS_SHORT': [
-            _('Sun'),
-            _('Mon'),
-            _('Tue'),
-            _('Wed'),
-            _('Thu'),
-            _('Fri'),
-            _('Sat')
-        ]
+        'MONTHS': [str(m) for m in MONTHS.values()],
+
+        # Django's WEEKDAYS list begins on Monday, but ours should start on Sunday, so start
+        # counting from -1 and use modulo 7 to get an array index
+        'WEEKDAYS': [str(WEEKDAYS[d % 7]) for d in range(-1, 6)],
+        'WEEKDAYS_SHORT': [str(WEEKDAYS_ABBR[d % 7]) for d in range(-1, 6)],
     }
 
 

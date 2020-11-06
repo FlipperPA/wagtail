@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# Roger Pons <rogerpons@gmail.com>, 2017
+# Roger Pons <rogerpons@gmail.com>, 2017,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-10-16 17:06+0000\n"
-"Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-27 13:55+0000\n"
+"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/torchbox/wagtail/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Wagtail ModelAdmin"
+msgstr "ModelAdmin de Wagtail"
 
 msgid "Parent page"
 msgstr "Pàgina pare"
@@ -109,6 +112,9 @@ msgstr "Tornar a la llista"
 msgid "Yes, delete"
 msgstr "Sí, eliminar"
 
+msgid "No, don't delete"
+msgstr "No, no esborrar"
+
 msgid "Home"
 msgstr "Inici"
 
@@ -126,6 +132,12 @@ msgstr "Cercar per"
 #, python-format
 msgid "Search %(name)s"
 msgstr "Cercar %(name)s"
+
+msgid "Download XLSX"
+msgstr "Descarregar XLSX"
+
+msgid "Download CSV"
+msgstr "Descarregar CSV"
 
 msgid "Filter"
 msgstr "Filtrar"
@@ -154,6 +166,9 @@ msgstr ""
 "\"%(url)s\">afegiu un</a>?\n"
 "                                            "
 
+msgid "Pagination"
+msgstr "Paginació"
+
 #, python-format
 msgid "Page %(current_page)s of %(num_pages)s."
 msgstr "Pàgina %(current_page)s de %(num_pages)s."
@@ -167,6 +182,10 @@ msgstr "Anterior"
 
 msgid "Next"
 msgstr "Següent"
+
+#, python-format
+msgid "%(model_name)s '%(instance)s' created."
+msgstr "%(model_name)s '%(instance)s' creat."
 
 #, python-format
 msgid "The %s could not be created due to errors."
@@ -187,6 +206,10 @@ msgid "Editing %s"
 msgstr "Editant %s"
 
 #, python-format
+msgid "%(model_name)s '%(instance)s' updated."
+msgstr "%(model_name)s '%(instance)s' actualitzat."
+
+#, python-format
 msgid "The %s could not be saved due to errors."
 msgstr "No s'ha pogut desar el %s a causa d'errors."
 
@@ -201,6 +224,10 @@ msgid ""
 msgstr ""
 "Segur que voleu eliminar aquest %s? Si hi ha altres elements del vostre lloc "
 "relacionats amb ell podrien veure's afectats."
+
+#, python-format
+msgid "%(model_name)s '%(instance)s' deleted."
+msgstr "%(model_name)s '%(instance)s' esborrat."
 
 msgid "Inspecting"
 msgstr "Inspeccionant"

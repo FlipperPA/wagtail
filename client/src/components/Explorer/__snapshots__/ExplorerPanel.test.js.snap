@@ -7,7 +7,7 @@ exports[`ExplorerPanel general rendering #isError 1`] = `
   className="explorer"
   focusTrapOptions={
     Object {
-      "initialFocus": ".c-explorer__header",
+      "initialFocus": ".c-explorer__header__title",
       "onDeactivate": [MockFunction],
     }
   }
@@ -17,12 +17,11 @@ exports[`ExplorerPanel general rendering #isError 1`] = `
 >
   <Button
     accessibleLabel={null}
-    className="c-explorer__close u-hidden"
+    className="c-explorer__close"
     dialogTrigger={false}
     href="#"
-    icon=""
     isLoading={false}
-    onClick={[MockFunction]}
+    onClick={null}
     preventDefault={true}
     target={null}
   >
@@ -37,10 +36,11 @@ exports[`ExplorerPanel general rendering #isError 1`] = `
   >
     <div
       className="c-transition-group"
-      key="0"
+      key="1"
     >
       <ExplorerHeader
-        depth={0}
+        depth={1}
+        gotoPage={[MockFunction]}
         onClick={[Function]}
         page={
           Object {
@@ -48,6 +48,9 @@ exports[`ExplorerPanel general rendering #isError 1`] = `
               "items": Array [],
             },
             "isError": true,
+            "meta": Object {
+              "parent": null,
+            },
           }
         }
       />
@@ -71,6 +74,9 @@ exports[`ExplorerPanel general rendering #isError 1`] = `
               "items": Array [],
             },
             "isError": true,
+            "meta": Object {
+              "parent": null,
+            },
           }
         }
       />
@@ -86,22 +92,21 @@ exports[`ExplorerPanel general rendering #isFetching 1`] = `
   className="explorer"
   focusTrapOptions={
     Object {
-      "initialFocus": ".c-explorer__header",
+      "initialFocus": ".c-explorer__header__title",
       "onDeactivate": [MockFunction],
     }
   }
-  paused={true}
+  paused={false}
   role="dialog"
   tag="div"
 >
   <Button
     accessibleLabel={null}
-    className="c-explorer__close u-hidden"
+    className="c-explorer__close"
     dialogTrigger={false}
     href="#"
-    icon=""
     isLoading={false}
-    onClick={[MockFunction]}
+    onClick={null}
     preventDefault={true}
     target={null}
   >
@@ -116,10 +121,11 @@ exports[`ExplorerPanel general rendering #isFetching 1`] = `
   >
     <div
       className="c-transition-group"
-      key="0"
+      key="1"
     >
       <ExplorerHeader
-        depth={0}
+        depth={1}
+        gotoPage={[MockFunction]}
         onClick={[Function]}
         page={
           Object {
@@ -127,6 +133,9 @@ exports[`ExplorerPanel general rendering #isFetching 1`] = `
               "items": Array [],
             },
             "isFetching": true,
+            "meta": Object {
+              "parent": null,
+            },
           }
         }
       />
@@ -136,12 +145,6 @@ exports[`ExplorerPanel general rendering #isFetching 1`] = `
         <div
           key="children"
         />
-        <div
-          className="c-explorer__placeholder"
-          key="fetching"
-        >
-          <LoadingSpinner />
-        </div>
       </div>
     </div>
   </Transition>
@@ -155,7 +158,7 @@ exports[`ExplorerPanel general rendering #items 1`] = `
   className="explorer"
   focusTrapOptions={
     Object {
-      "initialFocus": ".c-explorer__header",
+      "initialFocus": ".c-explorer__header__title",
       "onDeactivate": [MockFunction],
     }
   }
@@ -165,12 +168,11 @@ exports[`ExplorerPanel general rendering #items 1`] = `
 >
   <Button
     accessibleLabel={null}
-    className="c-explorer__close u-hidden"
+    className="c-explorer__close"
     dialogTrigger={false}
     href="#"
-    icon=""
     isLoading={false}
-    onClick={[MockFunction]}
+    onClick={null}
     preventDefault={true}
     target={null}
   >
@@ -185,10 +187,11 @@ exports[`ExplorerPanel general rendering #items 1`] = `
   >
     <div
       className="c-transition-group"
-      key="0"
+      key="1"
     >
       <ExplorerHeader
-        depth={0}
+        depth={1}
+        gotoPage={[MockFunction]}
         onClick={[Function]}
         page={
           Object {
@@ -249,7 +252,7 @@ exports[`ExplorerPanel general rendering no children 1`] = `
   className="explorer"
   focusTrapOptions={
     Object {
-      "initialFocus": ".c-explorer__header",
+      "initialFocus": ".c-explorer__header__title",
       "onDeactivate": [MockFunction],
     }
   }
@@ -259,12 +262,11 @@ exports[`ExplorerPanel general rendering no children 1`] = `
 >
   <Button
     accessibleLabel={null}
-    className="c-explorer__close u-hidden"
+    className="c-explorer__close"
     dialogTrigger={false}
     href="#"
-    icon=""
     isLoading={false}
-    onClick={[MockFunction]}
+    onClick={null}
     preventDefault={true}
     target={null}
   >
@@ -279,10 +281,11 @@ exports[`ExplorerPanel general rendering no children 1`] = `
   >
     <div
       className="c-transition-group"
-      key="0"
+      key="1"
     >
       <ExplorerHeader
-        depth={0}
+        depth={1}
+        gotoPage={[MockFunction]}
         onClick={[Function]}
         page={
           Object {
@@ -312,7 +315,7 @@ exports[`ExplorerPanel general rendering renders 1`] = `
   className="explorer"
   focusTrapOptions={
     Object {
-      "initialFocus": ".c-explorer__header",
+      "initialFocus": ".c-explorer__header__title",
       "onDeactivate": [MockFunction],
     }
   }
@@ -322,12 +325,11 @@ exports[`ExplorerPanel general rendering renders 1`] = `
 >
   <Button
     accessibleLabel={null}
-    className="c-explorer__close u-hidden"
+    className="c-explorer__close"
     dialogTrigger={false}
     href="#"
-    icon=""
     isLoading={false}
-    onClick={[MockFunction]}
+    onClick={null}
     preventDefault={true}
     target={null}
   >
@@ -342,15 +344,19 @@ exports[`ExplorerPanel general rendering renders 1`] = `
   >
     <div
       className="c-transition-group"
-      key="0"
+      key="1"
     >
       <ExplorerHeader
-        depth={0}
+        depth={1}
+        gotoPage={[MockFunction]}
         onClick={[Function]}
         page={
           Object {
             "children": Object {
               "items": Array [],
+            },
+            "meta": Object {
+              "parent": null,
             },
           }
         }

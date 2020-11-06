@@ -13,7 +13,7 @@
 
 {% block content %}
     {% trans "Add documents" as add_str %}
-    {% include "wagtailadmin/shared/header.html" with title=add_str icon="doc" %}
+    {% include "wagtailadmin/shared/header.html" with title=add_str icon="doc-full-inverse" %}
 
     <div class="nice-padding">
         <div class="drop-zone">
@@ -22,17 +22,26 @@
 
             <form action="{% url 'wagtaildocs:add_multiple' %}" method="POST" enctype="multipart/form-data">
                 <div class="replace-file-input">
-                    <button class="button bicolor icon icon-plus">{% trans "Or choose from your computer" %}</button>
+                    <button class="button bicolor button--icon">{% icon name="plus" wrapped=1 %}{% trans "Or choose from your computer" %}</button>
                     <input id="fileupload" type="file" name="files[]" data-url="{% url 'wagtaildocs:add_multiple' %}" multiple>
                 </div>
                 {% csrf_token %}
                 {% if collections %}
-                    <div class="field">
+                    <div class="field choice_field select">
                         <label for="id_adddocument_collection">{% trans "Add to collection:" %}</label>
                         <div class="field-content">
                             <select id="id_adddocument_collection" name="collection">
+                                {% minimum_collection_depth collections as min_depth %}
                                 {% for collection in collections %}
-                                    <option value="{{ collection.id|unlocalize }}">{{ collection.name }}</option>
+                                    <option value="{{ collection.id|unlocalize }}">
+                                      {% if request.user.is_superuser %}
+                                          {# Superuser may see all collections. #}
+                                          {% format_collection collection %}
+                                      {% else %}
+                                          {# Pass the minimum depth of the permitted collections, since user isn't a superuser #}
+                                          {% format_collection collection min_depth %}
+                                      {% endif %}
+                                    </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -60,6 +69,7 @@
             <div class="right col9">
                 <p class="status-msg success">{% trans "Upload successful. Please update this document with a more appropriate title, if necessary. You may also delete the document completely if the upload wasn't required." %}</p>
                 <p class="status-msg failure">{% trans "Sorry, upload failed." %}</p>
+                <p class="status-msg update-success">{% trans "Document updated." %}</p>
                 <p class="status-msg failure error_messages"></p>
             </div>
         </li>

@@ -59,6 +59,9 @@ spelling:
 	@echo
 	@echo "Spellcheck complete."
 
+lint:
+	doc8 --config ../setup.cfg
+
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo

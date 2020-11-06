@@ -7,49 +7,65 @@
 
 {% block content %}
 
-    <header class="merged tab-merged" role="banner">
+    <header class="merged tab-merged">
         {% explorer_breadcrumb parent_page include_self=1 %}
 
-        <div class="row row-flush">
+        <div class="row">
             <div class="left col9 header-title">
-                <h1 class="icon icon-doc-empty-inverse">
-                {% trans 'New' %} <span>{{ content_type.model_class.get_verbose_name }}</span></h1>
+                <h1>{% trans 'New' %} <span>{{ content_type.model_class.get_verbose_name }}</span></h1>
             </div>
         </div>
+
+        {% if locale %}
+        <ul class="row header-meta">
+            <li class="header-meta--locale">
+                {% include "wagtailadmin/shared/locale_selector.html" %}
+            </li>
+        </ul>
+        {% endif %}
     </header>
 
     <form id="page-edit-form" action="{% url 'wagtailadmin_pages:add' content_type.app_label content_type.model parent_page.id %}" method="POST" novalidate{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
+
+        {% if parent_page.is_root %}
+            {# The user is allowed to set a different locale for pages created at the root #}
+            {# If they've done this, make sure their chosen locale is passed in the form #}
+            <input type="hidden" name="locale" value="{{ locale.language_code }}">
+        {% endif %}
+
         {{ edit_handler.render_form_content }}
 
-        <footer role="contentinfo">
+        <footer>
             <nav aria-label="{% trans 'Actions' %}">
                 <ul>
-                  <li class="actions">
-                      <div class="dropdown dropup dropdown-button match-width {% if is_revision %}warning{% endif %}">
-                          {{ action_menu.render_html }}
-                      </div>
-                  </li>
-
-                    <li class="preview">
-                        {% trans 'Preview' as preview_label %}
-                        {% if preview_modes|length > 1 %}
-                            <div class="dropdown dropup dropdown-button match-width">
-                                {% include "wagtailadmin/pages/_preview_button_on_create.html" with label=preview_label icon=1 %}
-                                <div class="dropdown-toggle icon icon-arrow-up"></div>
-                                <ul>
-                                    {% for mode_name, mode_display_name in preview_modes %}
-                                        <li>
-                                            {% include "wagtailadmin/pages/_preview_button_on_create.html" with mode=mode_name label=mode_display_name %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% else %}
-                            {% include "wagtailadmin/pages/_preview_button_on_create.html" with label=preview_label icon=1 %}
-                        {% endif %}
+                    <li class="actions actions--primary">
+                        <div class="dropdown dropup dropdown-button dropdown-button--white match-width {% if is_revision %}warning{% endif %}">
+                            {{ action_menu.render_html }}
+                        </div>
                     </li>
+
+                    {% if preview_modes %}
+                        <li class="preview">
+                            {% trans 'Preview' as preview_label %}
+                            {% if preview_modes|length > 1 %}
+                                <div class="dropdown dropup dropdown-button match-width">
+                                    {% include "wagtailadmin/pages/_preview_button_on_create.html" with label=preview_label icon=1 %}
+                                    <div class="dropdown-toggle">{% icon name="arrow-up" %}</div>
+                                    <ul>
+                                        {% for mode_name, mode_display_name in preview_modes %}
+                                            <li>
+                                                {% include "wagtailadmin/pages/_preview_button_on_create.html" with mode=mode_name label=mode_display_name %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% else %}
+                                {% include "wagtailadmin/pages/_preview_button_on_create.html" with label=preview_label icon=1 %}
+                            {% endif %}
+                        </li>
+                    {% endif %}
                     {% block extra_footer_actions %}
                     {% endblock %}
                 </ul>
@@ -77,7 +93,7 @@
     {{ action_menu.media.js }}
 
     {% comment %}
-        Additional HTML code that edit handlers define through 'html_declarations'. (Technically this isn't Javascript, but it will generally be data that exists for Javascript to work with...)
+        Additional HTML code that edit handlers define through 'html_declarations'. (Technically this isn't JavaScript, but it will generally be data that exists for JavaScript to work with...)
     {% endcomment %}
     {{ edit_handler.html_declarations }}
 

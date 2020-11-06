@@ -2,8 +2,10 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.utils.encoding import force_str
 
 from wagtail.core.blocks import Block, BlockField, StreamBlock, StreamValue
+from wagtail.core.rich_text import get_text_for_indexing
 
 
 class RichTextField(models.TextField):
@@ -19,6 +21,11 @@ class RichTextField(models.TextField):
         defaults.update(kwargs)
         return super().formfield(**defaults)
 
+    def get_searchable_content(self, value):
+        # Strip HTML tags to prevent search backend from indexing them
+        source = force_str(value)
+        return [get_text_for_indexing(source)]
+
 
 # https://github.com/django/django/blob/64200c14e0072ba0ffef86da46b2ea82fd1e019a/django/db/models/fields/subclassing.py#L31-L44
 class Creator:
@@ -31,7 +38,12 @@ class Creator:
     def __get__(self, obj, type=None):
         if obj is None:
             return self
-        return obj.__dict__[self.field.name]
+        field_name = self.field.name
+
+        if field_name not in obj.__dict__:
+            # Field is deferred. Fetch it from db.
+            obj.refresh_from_db(fields=[field_name])
+        return obj.__dict__[field_name]
 
     def __set__(self, obj, value):
         obj.__dict__[self.field.name] = self.field.to_python(value)

@@ -7,20 +7,22 @@
 # fooflare <amos.oviedo@gmail.com>, 2014
 # Daniel Chimeno <daniel@chimeno.me>, 2017
 # Daniel Chimeno <daniel@chimeno.me>, 2015-2016
+# Daniel Wohlgemuth <daniel.wohlgemuth.epp@gmail.com>, 2020
 # fooflare <amos.oviedo@gmail.com>, 2014
 # José Luis <alagunajs@gmail.com>, 2015-2016
 # José Luis <alagunajs@gmail.com>, 2017-2018
 # Mauricio Baeza <python@amigos.email>, 2014-2015
 # Mauricio Baeza <python@amigos.email>, 2015
 # Mauricio Baeza <python@amigos.email>, 2014
+# Oscar Luciano Espirilla Flores, 2020
 # José Luis <alagunajs@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-07-09 13:30+0000\n"
-"Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-09-23 01:28+0000\n"
+"Last-Translator: Daniel Wohlgemuth <daniel.wohlgemuth.epp@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/torchbox/wagtail/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -173,8 +175,14 @@ msgstr "Agregar grupo"
 msgid "Editing"
 msgstr "Editando"
 
+msgid "View users in this group"
+msgstr "Ver usuarios en este grupo"
+
 msgid "Save"
 msgstr "Guardar"
+
+msgid "Permissions"
+msgstr "Permisos"
 
 msgid "Object permissions"
 msgstr "Permisos del objeto"
@@ -291,11 +299,19 @@ msgstr "Lo sentimos, ningún usuario coincide con \"<em>%(query_string)s</em>\""
 
 #, python-format
 msgid ""
-"There are no users configured. Why not <a href=\"%(wagtailusers_create_url)s"
+"The %(group_name)s group has no users configured. Why not <a href="
+"\"%(wagtailusers_add_url)s\">add some</a>?"
+msgstr ""
+"El grupo %(group_name)s no tiene usuarios configurados. ¿Por qué no <a href="
+"\"%(wagtailusers_add_url)s\">añadir alguno</a>?"
+
+#, python-format
+msgid ""
+"There are no users configured. Why not <a href=\"%(wagtailusers_add_url)s"
 "\">add some</a>?"
 msgstr ""
-"No hay usuarios configurados. ¿Por qué no <a href="
-"\"%(wagtailusers_create_url)s\">añadir alguno</a>?"
+"No hay usuarios configurados. ¿Por qué no <a href=\"%(wagtailusers_add_url)s"
+"\">añadir alguno</a>?"
 
 msgid "Groups"
 msgstr "Grupos"

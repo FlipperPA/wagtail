@@ -3,16 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# IT Management <info@itmanagement.cz>, 2018
+# IT Management <hudan@itmanagement.cz>, 2018
+# IT Management <hudan@itmanagement.cz>, 2020
 # Jiri Stepanek <stepiiicz@gmail.com>, 2015
-# Mirek Zvolský <zvolsky@seznam.cz>, 2019
+# Mirek Zvolský <zvolsky@seznam.cz>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-07-09 13:30+0000\n"
-"Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-08-03 20:09+0000\n"
+"Last-Translator: Mirek Zvolský <zvolsky@seznam.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/torchbox/wagtail/language/"
 "cs/)\n"
 "MIME-Version: 1.0\n"
@@ -82,7 +83,7 @@ msgid "Current time zone"
 msgstr "Aktuální časové pásmo"
 
 msgid "Upload a profile picture"
-msgstr "Nahrát profilový obrázek"
+msgstr "Nahrát profilovou fotografii"
 
 msgid "submitted notifications"
 msgstr "odeslané upozornění"
@@ -112,10 +113,10 @@ msgid "current time zone"
 msgstr "aktuální časové pásmo"
 
 msgid "Select your current time zone"
-msgstr "Zvolte Vaše časové pásmo"
+msgstr "Zvolte vaše časové pásmo"
 
 msgid "profile picture"
-msgstr "profilový obrázek"
+msgstr "profilová fotografie"
 
 msgid "user profile"
 msgstr "uživatelský profile"
@@ -173,8 +174,14 @@ msgstr "Přidat skupinu"
 msgid "Editing"
 msgstr "Úprava"
 
+msgid "View users in this group"
+msgstr "Zobrazit uživatele v této skupině"
+
 msgid "Save"
 msgstr "Uložit"
+
+msgid "Permissions"
+msgstr "Oprávnění"
 
 msgid "Object permissions"
 msgstr "Oprávnění k objektům"
@@ -296,11 +303,19 @@ msgstr ""
 
 #, python-format
 msgid ""
-"There are no users configured. Why not <a href=\"%(wagtailusers_create_url)s"
+"The %(group_name)s group has no users configured. Why not <a href="
+"\"%(wagtailusers_add_url)s\">add some</a>?"
+msgstr ""
+" %(group_name)s skupina nemá žádné uživatele. Pojďme <a href="
+"\"%(wagtailusers_add_url)s\">nějaké přidat</a>?"
+
+#, python-format
+msgid ""
+"There are no users configured. Why not <a href=\"%(wagtailusers_add_url)s"
 "\">add some</a>?"
 msgstr ""
-"Nebyly nalezeny žádní uživatelé. Nového uživatele můžete přidat <a href="
-"\"%(wagtailusers_create_url)s\">zde</a>."
+"Nejsou určeni uživatelé. Pojďme <a href=\"%(wagtailusers_add_url)s\">nějaké "
+"přidat</a>?"
 
 msgid "Groups"
 msgstr "Skupiny"

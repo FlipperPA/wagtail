@@ -255,6 +255,25 @@ A few special cases to note about ``list_display``:
             list_display = ('full_name',)
 
 
+.. _modeladmin_list_export:
+
+---------------------------
+``ModelAdmin.list_export``
+---------------------------
+
+**Expected value**: A list or tuple, where each item is the name of a field or
+single-argument callable on your model, or a similarly simple method defined
+on the ``ModelAdmin`` class itself.
+
+Set ``list_export`` to set the fields you wish to be exported as columns when
+downloading a spreadsheet version of your index_view
+
+.. code-block:: python
+
+    class PersonAdmin(ModelAdmin):
+        list_export = ('is_staff', 'company')
+
+
 .. _modeladmin_list_filter:
 
 ---------------------------
@@ -272,6 +291,21 @@ for your model. For example:
 
     class PersonAdmin(ModelAdmin):
         list_filter = ('is_staff', 'company')
+
+
+.. _modeladmin_export_filename:
+
+------------------------------
+``ModelAdmin.export_filename``
+------------------------------
+
+**Expected value**: A string specifying the filename of an exported spreadsheet,
+without file extensions.
+
+.. code-block:: python
+
+    class PersonAdmin(ModelAdmin):
+        export_filename = 'people_spreadsheet'
 
 
 .. _modeladmin_search_fields:
@@ -428,7 +462,7 @@ For example:
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        managed_by = models.ForeignKey(`auth.User`, on_delete=models.CASCADE)
+        managed_by = models.ForeignKey('auth.User', on_delete=models.CASCADE)
 
 
     class PersonAdmin(ModelAdmin):
@@ -520,12 +554,12 @@ depending on the row's value, you could do something like:
         list_display = ('name', 'account_number', 'balance')
 
         def get_extra_class_names_for_field_col(self, obj, field_name):
-            field_name == 'balance':
-                if balance <= Decimal('-100.00'):
+            if field_name == 'balance':
+                if obj.balance <= Decimal('-100.00'):
                     return ['brand-danger']
-                if balance <= Decimal('-0.00'):
+                elif obj.balance <= Decimal('-0.00'):
                     return ['brand-warning']
-                if balance <= Decimal('-50.00'):
+                elif obj.balance <= Decimal('50.00'):
                     return ['brand-info']
                 else:
                     return ['brand-success']
@@ -653,10 +687,10 @@ change a few attributes to change the thumbnail to your liking, like so:
         # Optionally override the filter spec used to create each thumb
         thumb_image_filter_spec = 'fill-100x100' # this is the default
 
-        # Optionally override the 'width' attribute value added to each img tag
+        # Optionally override the 'width' attribute value added to each `<img>` tag
         thumb_image_width = 50 # this is the default
 
-        # Optionally override the class name added to each img tag
+        # Optionally override the class name added to each `<img>` tag
         thumb_classname = 'admin-thumb' # this is the default
 
         # Optionally override the text that appears in the column header

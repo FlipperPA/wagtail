@@ -5,7 +5,7 @@ Integrating Wagtail into a Django project
 
 Wagtail provides the ``wagtail start`` command and project template to get you started with a new Wagtail project as quickly as possible, but it's easy to integrate Wagtail into an existing Django project too.
 
-Wagtail is currently compatible with Django 2.1, 2.2 and 3.0. First, install the ``wagtail`` package from PyPI:
+Wagtail is currently compatible with Django 2.2, 3.0 and 3.1. First, install the ``wagtail`` package from PyPI:
 
 .. code-block:: console
 
@@ -35,22 +35,18 @@ In your settings file, add the following apps to ``INSTALLED_APPS``:
     'modelcluster',
     'taggit',
 
-Add the following entries to ``MIDDLEWARE``:
+Add the following entry to ``MIDDLEWARE``:
 
 .. code-block:: python
 
-    'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-
-.. note::
-   Wagtail is currently incompatible with projects using ``django.contrib.sites.middleware.CurrentSiteMiddleware``, as both this and ``wagtail.core.middleware.SiteMiddleware`` set the attribute ``request.site``.
 
 Add a ``STATIC_ROOT`` setting, if your project does not have one already:
 
 .. code-block:: python
 
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-    
+
 Add ``MEDIA_ROOT`` and ``MEDIA_URL`` settings, if your project does not have these already:
 
 .. code-block:: python
@@ -81,9 +77,9 @@ Now make the following additions to your ``urls.py`` file:
 
     urlpatterns = [
         ...
-        re_path(r'^cms/', include(wagtailadmin_urls)),
-        re_path(r'^documents/', include(wagtaildocs_urls)),
-        re_path(r'^pages/', include(wagtail_urls)),
+        path('cms/', include(wagtailadmin_urls)),
+        path('documents/', include(wagtaildocs_urls)),
+        path('pages/', include(wagtail_urls)),
         ...
     ]
 

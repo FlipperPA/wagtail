@@ -2,7 +2,9 @@
 # to sendfile()
 # See: https://github.com/johnsensible/django-sendfile/pull/33
 import os.path
+
 from mimetypes import guess_type
+
 
 VERSION = (0, 3, 6)
 __version__ = '.'.join(map(str, VERSION))
@@ -26,6 +28,7 @@ def _lazy_load(fn):
 @_lazy_load
 def _get_sendfile():
     from importlib import import_module
+
     from django.conf import settings
     from django.core.exceptions import ImproperlyConfigured
 
@@ -71,16 +74,23 @@ def sendfile(request, filename, attachment=False, attachment_filename=None, mime
             attachment_filename = os.path.basename(filename)
         parts = ['attachment']
         if attachment_filename:
-            from unidecode import unidecode
             from django.utils.encoding import force_str
+
+            from wagtail.core.utils import string_to_ascii
+
             attachment_filename = force_str(attachment_filename)
-            ascii_filename = unidecode(attachment_filename)
+            ascii_filename = string_to_ascii(attachment_filename)
             parts.append('filename="%s"' % ascii_filename)
+
             if ascii_filename != attachment_filename:
                 from django.utils.http import urlquote
+
                 quoted_filename = urlquote(attachment_filename)
                 parts.append('filename*=UTF-8\'\'%s' % quoted_filename)
+
         response['Content-Disposition'] = '; '.join(parts)
+    else:
+        response['Content-Disposition'] = 'inline'
 
     response['Content-length'] = os.path.getsize(filename)
     response['Content-Type'] = mimetype

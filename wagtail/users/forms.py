@@ -1,4 +1,5 @@
 import warnings
+
 from itertools import groupby
 from operator import itemgetter
 
@@ -14,7 +15,7 @@ from django.db import transaction
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.template.loader import render_to_string
 from django.utils.html import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from wagtail.admin.localization import get_available_admin_languages, get_available_admin_time_zones
 from wagtail.admin.widgets import AdminPageChooser
@@ -23,6 +24,7 @@ from wagtail.core.models import (
     PAGE_PERMISSION_TYPE_CHOICES, PAGE_PERMISSION_TYPES, GroupPagePermission, Page,
     UserPagePermissionsProxy)
 from wagtail.users.models import UserProfile
+
 
 User = get_user_model()
 
@@ -83,11 +85,11 @@ class UserForm(UsernameForm):
 
     password1 = forms.CharField(
         label=_('Password'), required=False,
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
         help_text=_("Leave blank if not changing."))
     password2 = forms.CharField(
         label=_("Password confirmation"), required=False,
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
         help_text=_("Enter the same password as above, for verification."))
 
     is_superuser = forms.BooleanField(

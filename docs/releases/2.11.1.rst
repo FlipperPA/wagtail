@@ -1,0 +1,17 @@
+=============================================
+Wagtail 2.11.1 release notes - IN DEVELOPMENT
+=============================================
+
+.. contents::
+    :local:
+    :depth: 1
+
+
+What's new
+==========
+
+Bug fixes
+~~~~~~~~~
+
+ * Ensure that cached ``wagtail_site_root_paths`` structures from older Wagtail versions are invalidated (Sævar Öfjörð Magnússon)
+ * Avoid circular import between wagtail.admin.auth and custom user models (Matt Westcott)

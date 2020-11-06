@@ -117,7 +117,6 @@ class ImageOperationTestCase(TestCase):
         test_norun.__name__ = str('test_norun_%s' % filter_spec)
         return test_norun
 
-
     @classmethod
     def setup_test_methods(cls):
         if cls.operation_class is None:
@@ -361,6 +360,14 @@ class TestMinMaxOperation(ImageOperationTestCase):
         ('max-800x600', dict(width=1000, height=1000), [
             ('resize', ((600, 600), ), {}),
         ]),
+        # Resize doesn't try to set zero height
+        ('max-400x400', dict(width=1000, height=1), [
+            ('resize', ((400, 1), ), {}),
+        ]),
+        # Resize doesn't try to set zero width
+        ('max-400x400', dict(width=1, height=1000), [
+            ('resize', ((1, 400), ), {}),
+        ]),
     ]
 
 
@@ -390,6 +397,14 @@ class TestWidthHeightOperation(ImageOperationTestCase):
         # Basic usage of height
         ('height-400', dict(width=1000, height=500), [
             ('resize', ((800, 400), ), {}),
+        ]),
+        # Resize doesn't try to set zero height
+        ('width-400', dict(width=1000, height=1), [
+            ('resize', ((400, 1), ), {}),
+        ]),
+        # Resize doesn't try to set zero width
+        ('height-400', dict(width=1, height=800), [
+            ('resize', ((1, 400), ), {}),
         ]),
     ]
 
@@ -424,6 +439,14 @@ class TestScaleOperation(ImageOperationTestCase):
         # Rounded usage of scale
         ('scale-83.0322', dict(width=1000, height=500), [
             ('resize', ((int(1000 * 0.830322), int(500 * 0.830322)), ), {}),
+        ]),
+        # Resize doesn't try to set zero height
+        ('scale-50', dict(width=1000, height=1), [
+            ('resize', ((500, 1), ), {}),
+        ]),
+        # Resize doesn't try to set zero width
+        ('scale-50', dict(width=1, height=500), [
+            ('resize', ((1, 250), ), {}),
         ]),
     ]
 
@@ -461,10 +484,18 @@ class TestCacheKey(TestCase):
         self.assertEqual(cache_key, '0bbe3b2f')
 
 
+def register_image_operations_hook():
+    return [
+        ('operation1', Mock(return_value=TestFilter.operation_instance)),
+        ('operation2', Mock(return_value=TestFilter.operation_instance))
+    ]
+
+
 class TestFilter(TestCase):
 
     operation_instance = Mock()
 
+    @hooks.register_temporarily('register_image_operations', register_image_operations_hook)
     def test_runs_operations(self):
         run_mock = Mock()
 
@@ -481,14 +512,6 @@ class TestFilter(TestCase):
         fil.run(image, BytesIO())
 
         self.assertEqual(run_mock.call_count, 2)
-
-
-@hooks.register('register_image_operations')
-def register_image_operations():
-    return [
-        ('operation1', Mock(return_value=TestFilter.operation_instance)),
-        ('operation2', Mock(return_value=TestFilter.operation_instance))
-    ]
 
 
 class TestFormatFilter(TestCase):
@@ -531,6 +554,20 @@ class TestFormatFilter(TestCase):
         out = fil.run(image, BytesIO())
 
         self.assertEqual(out.format_name, 'webp')
+
+    def test_webp_lossless(self):
+        fil = Filter(spec='width-400|format-webp-lossless')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file(),
+        )
+
+        f = BytesIO()
+        with patch('PIL.Image.Image.save') as save:
+            fil.run(image, f)
+
+        # quality=80 is default for Williw and PIL libs
+        save.assert_called_with(f, 'WEBP', quality=80, lossless=True)
 
     def test_invalid(self):
         fil = Filter(spec='width-400|format-foo')
@@ -623,6 +660,90 @@ class TestJPEGQualityFilter(TestCase):
             fil.run(image, f)
 
         save.assert_called_with(f, 'JPEG', quality=40, optimize=True, progressive=True)
+
+
+class TestWebPQualityFilter(TestCase):
+    def test_default_quality(self):
+        fil = Filter(spec='width-400|format-webp')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file_jpeg(),
+        )
+
+        f = BytesIO()
+        with patch('PIL.Image.Image.save') as save:
+            fil.run(image, f)
+
+        save.assert_called_with(f, 'WEBP', quality=85, lossless=False)
+
+    def test_webp_quality_filter(self):
+        fil = Filter(spec='width-400|webpquality-40|format-webp')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file_jpeg(),
+        )
+
+        f = BytesIO()
+        with patch('PIL.Image.Image.save') as save:
+            fil.run(image, f)
+
+        save.assert_called_with(f, 'WEBP', quality=40, lossless=False)
+
+    def test_webp_quality_filter_invalid(self):
+        fil = Filter(spec='width-400|webpquality-abc|format-webp')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file_jpeg(),
+        )
+        self.assertRaises(InvalidFilterSpecError, fil.run, image, BytesIO())
+
+    def test_webp_quality_filter_no_value(self):
+        fil = Filter(spec='width-400|webpquality')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file_jpeg(),
+        )
+        self.assertRaises(InvalidFilterSpecError, fil.run, image, BytesIO())
+
+    def test_webp_quality_filter_too_big(self):
+        fil = Filter(spec='width-400|webpquality-101|format-webp')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file_jpeg(),
+        )
+        self.assertRaises(InvalidFilterSpecError, fil.run, image, BytesIO())
+
+    @override_settings(
+        WAGTAILIMAGES_WEBP_QUALITY=50
+    )
+    def test_webp_quality_setting(self):
+        fil = Filter(spec='width-400|format-webp')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file_jpeg(),
+        )
+
+        f = BytesIO()
+        with patch('PIL.Image.Image.save') as save:
+            fil.run(image, f)
+
+        save.assert_called_with(f, 'WEBP', quality=50, lossless=False)
+
+    @override_settings(
+        WAGTAILIMAGES_WEBP_QUALITY=50
+    )
+    def test_jpeg_quality_filter_overrides_setting(self):
+        fil = Filter(spec='width-400|webpquality-40|format-webp')
+        image = Image.objects.create(
+            title="Test image",
+            file=get_test_image_file_jpeg(),
+        )
+
+        f = BytesIO()
+        with patch('PIL.Image.Image.save') as save:
+            fil.run(image, f)
+
+        save.assert_called_with(f, 'WEBP', quality=40, lossless=False)
 
 
 class TestBackgroundColorFilter(TestCase):

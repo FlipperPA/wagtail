@@ -42,7 +42,7 @@ Search
 
   WAGTAILSEARCH_BACKENDS = {
       'default': {
-          'BACKEND': 'wagtail.search.backends.elasticsearch2',
+          'BACKEND': 'wagtail.search.backends.elasticsearch5',
           'INDEX': 'myapp'
       }
   }
@@ -64,6 +64,91 @@ Override the templates used by the search front-end views.
 
 Set the number of days (default 7) that search query logs are kept for; these are used to identify popular search terms for :ref:`promoted search results <editors-picks>`. Queries older than this will be removed by the :ref:`search_garbage_collect` command.
 
+Internationalisation
+====================
+
+.. versionadded:: 2.11
+
+Wagtail supports internationalisation of content by maintaining separate trees
+of pages for each language.
+
+For a guide on how to enable internationalisation on your site, see the :ref:`configuration guide <enabling_internationalisation>`.
+
+``WAGTAIL_I18N_ENABLED``
+------------------------
+
+(boolean, default ``False``)
+
+When set to ``True``, Wagtail's internationalisation features will be enabled:
+
+.. code-block:: python
+
+    WAGTAIL_I18N_ENABLED = True
+
+.. _wagtail_content_languages_setting:
+
+``WAGTAIL_CONTENT_LANGUAGES``
+-----------------------------
+
+(list, default ``[]``)
+
+A list of languages and/or locales that Wagtail content can be authored in.
+
+For example:
+
+.. code-block:: python
+
+    WAGTAIL_CONTENT_LANGUAGES = [
+        ('en', _("English")),
+        ('fr', _("French")),
+    ]
+
+Each item in the list is a 2-tuple containing a language code and a display name.
+The language code can either be a language code on its own (such as ``en``, ``fr``),
+or it can include a region code (such as ``en-gb``, ``fr-fr``).
+You can mix the two formats if you only need to localize in some regions but not others.
+
+This setting follows the same structure of Django's  ``LANGUAGES`` setting,
+so they can both be set to the same value:
+
+.. code-block:: python
+
+    LANGUAGES = WAGTAIL_CONTENT_LANGUAGES = [
+        ('en-gb', _("English (United Kingdom)")),
+        ('en-us', _("English (United States)")),
+        ('es-es', _("Spanish (Spain)")),
+        ('es-mx', _("Spanish (Mexico)")),
+    ]
+
+However having them separate allows you to configure many different regions on your site
+yet have them share Wagtail content (but defer on things like date formatting, currency, etc):
+
+.. code-block:: python
+
+    LANGUAGES = [
+        ('en', _("English (United Kingdom)")),
+        ('en-us', _("English (United States)")),
+        ('es', _("Spanish (Spain)")),
+        ('es-mx', _("Spanish (Mexico)")),
+    ]
+
+
+    WAGTAIL_CONTENT_LANGUAGES = [
+        ('en', _("English")),
+        ('es', _("Spanish")),
+    ]
+
+This would mean that your site will respond on the
+``https://www.mysite.com/es/`` and ``https://www.mysite.com/es-MX/`` URLs, but both
+of them will serve content from the same "Spanish" tree in Wagtail.
+
+.. note:: ``WAGTAIL_CONTENT_LANGUAGES`` must be a subset of ``LANGUAGES``
+
+    Note that all languages that exist in ``WAGTAIL_CONTENT_LANGUAGES``
+    must also exist in your ``LANGUAGES`` setting. This is so that Wagtail can
+    generate a live URL to these pages from an untranslated context (e.g. the admin
+    interface).
+
 Embeds
 ======
 
@@ -74,6 +159,13 @@ Wagtail has a builtin list of the most common providers.
 
 The embeds fetching can be fully configured using the ``WAGTAILEMBEDS_FINDERS``
 setting. This is fully documented in :ref:`configuring_embed_finders`.
+
+.. code-block:: python
+
+    WAGTAILEMBEDS_RESPONSIVE_HTML = True
+
+Adds ``class="responsive-object"`` and an inline ``padding-bottom`` style to embeds,
+to assist in making them responsive. See :ref:`responsive-embeds` for details.
 
 Dashboard
 =========
@@ -173,6 +265,36 @@ For this reason, Wagtail provides a number of serving methods which trade some o
 
 If ``WAGTAILDOCS_SERVE_METHOD`` is unspecified or set to ``None``, the default method is ``'redirect'`` when a remote storage backend is in use (i.e. one that exposes a URL but not a local filesystem path), and ``'serve_view'`` otherwise. Finally, some storage backends may not expose a URL at all; in this case, serving will proceed as for ``'serve_view'``.
 
+.. _wagtaildocs_content_types:
+
+.. code-block:: python
+
+  WAGTAILDOCS_CONTENT_TYPES = {
+      'pdf': 'application/pdf',
+      'txt': 'text/plain',
+  }
+
+Specifies the MIME content type that will be returned for the given file extension, when using the ``serve_view`` method. Content types not listed here will be guessed using the Python ``mimetypes.guess_type`` function, or ``application/octet-stream`` if unsuccessful.
+
+.. _wagtaildocs_inline_content_types:
+
+.. code-block:: python
+
+  WAGTAILDOCS_INLINE_CONTENT_TYPES = ['application/pdf', 'text/plain']
+
+A list of MIME content types that will be shown inline in the browser (by serving the HTTP header ``Content-Disposition: inline``) rather than served as a download, when using the ``serve_view`` method. Defaults to ``application/pdf``.
+
+.. _wagtaildocs_extensions:
+
+.. code-block:: python
+
+  WAGTAILDOCS_EXTENSIONS = ['pdf', 'docx']
+
+A list of allowed document extensions that will be validated during document uploading.
+If this isn't supplied all document extensions are allowed.
+Warning: this doesn't always ensure that the uploaded file is valid as files can
+be renamed to have an extension no matter what data they contain.
+
 Password Management
 ===================
 
@@ -186,7 +308,7 @@ This specifies whether users are allowed to change their passwords (enabled by d
 
   WAGTAIL_PASSWORD_RESET_ENABLED = True
 
-This specifies whether users are allowed to reset their passwords. Defaults to the same as ``WAGTAIL_PASSWORD_MANAGEMENT_ENABLED``.
+This specifies whether users are allowed to reset their passwords. Defaults to the same as ``WAGTAIL_PASSWORD_MANAGEMENT_ENABLED``. Password reset emails will be sent from the address specified in Django's ``DEFAULT_FROM_EMAIL`` setting.
 
 .. code-block:: python
 
@@ -215,7 +337,7 @@ Email Notifications
 
   WAGTAILADMIN_NOTIFICATION_FROM_EMAIL = 'wagtail@myhost.io'
 
-Wagtail sends email notifications when content is submitted for moderation, and when the content is accepted or rejected. This setting lets you pick which email address these automatic notifications will come from. If omitted, Django will fall back to using the ``DEFAULT_FROM_EMAIL`` variable if set, and ``webmaster@localhost`` if not.
+Wagtail sends email notifications when content is submitted for moderation, and when the content is accepted or rejected. This setting lets you pick which email address these automatic notifications will come from. If omitted, Wagtail will fall back to using Django's ``DEFAULT_FROM_EMAIL`` setting if set, or ``webmaster@localhost`` if not.
 
 .. code-block:: python
 
@@ -377,9 +499,10 @@ Date and DateTime inputs
 
     WAGTAIL_DATE_FORMAT = '%d.%m.%Y.'
     WAGTAIL_DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
+    WAGTAIL_TIME_FORMAT = '%H:%M'
 
 
-Specifies the date and datetime format to be used in input fields in the Wagtail admin. The format is specified in `Python datetime module syntax <https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior>`_, and must be one of the recognised formats listed in the ``DATE_INPUT_FORMATS`` or ``DATETIME_INPUT_FORMATS`` setting respectively (see `DATE_INPUT_FORMATS <https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DATE_INPUT_FORMATS>`_).
+Specifies the date, time and datetime format to be used in input fields in the Wagtail admin. The format is specified in `Python datetime module syntax <https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior>`_, and must be one of the recognised formats listed in the ``DATE_INPUT_FORMATS``, ``TIME_INPUT_FORMATS``, or ``DATETIME_INPUT_FORMATS`` setting respectively (see `DATE_INPUT_FORMATS <https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DATE_INPUT_FORMATS>`_).
 
 .. _WAGTAIL_USER_TIME_ZONES:
 
@@ -426,12 +549,12 @@ Static files
 
     WAGTAILADMIN_STATIC_FILE_VERSION_STRINGS = False
 
-Static file URLs within the Wagtail admin are given a version-specific query string of the form ``?v=1a2b3c4d``, to prevent outdated cached copies of Javascript and CSS files from persisting after a Wagtail upgrade. To disable these, set ``WAGTAILADMIN_STATIC_FILE_VERSION_STRINGS`` to ``False``.
+Static file URLs within the Wagtail admin are given a version-specific query string of the form ``?v=1a2b3c4d``, to prevent outdated cached copies of JavaScript and CSS files from persisting after a Wagtail upgrade. To disable these, set ``WAGTAILADMIN_STATIC_FILE_VERSION_STRINGS`` to ``False``.
 
 API Settings
 ============
 
-For full documenation on API configuration, including these settings, see :ref:`api_v2_configuration` documentation.
+For full documentation on API configuration, including these settings, see :ref:`api_v2_configuration` documentation.
 
 .. code-block:: python
 
@@ -457,12 +580,12 @@ Default is true, setting this to false will disable full text search on all endp
 
     WAGTAILAPI_USE_FRONTENDCACHE = True
 
-Requires ``wagtailfrontendcache`` app to be installed, inidicates the API should use the frontend cache.
+Requires ``wagtailfrontendcache`` app to be installed, indicates the API should use the frontend cache.
 
 Frontend cache
 ==============
 
-For full documenation on frontend cache invalidation, including these settings, see :ref:`frontend_cache_purging`.
+For full documentation on frontend cache invalidation, including these settings, see :ref:`frontend_cache_purging`.
 
 
 .. code-block:: python
@@ -511,3 +634,74 @@ Customise the behaviour of rich text fields. By default, ``RichTextField`` and `
  * ``WIDGET``: The rich text widget implementation to use. Wagtail provides two implementations: ``wagtail.admin.rich_text.DraftailRichTextArea`` (a modern extensible editor which enforces well-structured markup) and ``wagtail.admin.rich_text.HalloRichTextArea`` (deprecated; works directly at the HTML level). Other widgets may be provided by third-party packages.
 
  * ``OPTIONS``: Configuration options to pass to the widget. Recognised options are widget-specific, but both ``DraftailRichTextArea`` and ``HalloRichTextArea`` accept a ``features`` list indicating the active rich text features (see :ref:`rich_text_features`).
+
+If a ``'default'`` editor is not specified, rich text fields that do not specify an ``editor`` argument will use the Draftail editor with the default feature set enabled.
+
+.. versionchanged:: 2.10
+
+    Omitting the ``'default'`` editor now leaves the original default editor intact, so it is no longer necessary to redefine ``'default'`` when adding alternative editors.
+
+
+.. _WAGTAILADMIN_GLOBAL_PAGE_EDIT_LOCK:
+
+Page locking
+============
+
+``WAGTAILADMIN_GLOBAL_PAGE_EDIT_LOCK`` can be set to ``True`` to prevent users
+from editing pages that they have locked.
+
+Redirects
+=========
+
+.. code-block:: python
+
+   WAGTAIL_REDIRECTS_FILE_STORAGE = 'tmp_file'
+
+By default the redirect importer keeps track of the uploaded file as a temp file, but on certain environments (load balanced/cloud environments), you cannot keep a shared file between environments. For those cases you can use the built-in cache to store the file instead.
+
+.. code-block:: python
+
+   WAGTAIL_REDIRECTS_FILE_STORAGE = 'cache'
+
+Form builder
+============
+
+.. code-block:: python
+
+    WAGTAILFORMS_HELP_TEXT_ALLOW_HTML = True
+
+When true, HTML tags in form field help text will be rendered unescaped (default: False).
+
+.. WARNING::
+   Enabling this option will allow editors to insert arbitrary HTML into the page, such as scripts that could allow the editor to acquire administrator privileges when another administrator views the page. Do not enable this setting unless your editors are fully trusted.
+
+
+.. _workflow_settings:
+
+Workflow
+========
+
+.. code-block:: python
+
+  WAGTAIL_WORKFLOW_REQUIRE_REAPPROVAL_ON_EDIT = True
+
+Moderation workflows can be used in two modes. The first is to require that all tasks must approve a specific page revision for the workflow to complete. As a result,
+if edits are made to a page while it is in moderation, any approved tasks will need to be re-approved for the new revision before the workflow finishes.
+This is the default, ``WAGTAIL_WORKFLOW_REQUIRE_REAPPROVAL_ON_EDIT = True`` . The second mode does not require reapproval: if edits are made when
+tasks have already been approved, those tasks do not need to be reapproved. This is more suited to a hierarchical workflow system. To use workflows in this mode,
+set ``WAGTAIL_WORKFLOW_REQUIRE_REAPPROVAL_ON_EDIT = False``.
+
+.. code-block:: python
+
+  WAGTAIL_FINISH_WORKFLOW_ACTION = 'wagtail.core.workflows.publish_workflow_state'
+
+This sets the function to be called when a workflow completes successfully - by default, ``wagtail.core.workflows.publish_workflow_state``,
+which publishes the page. The function must accept a ``WorkflowState`` object as its only positional argument.
+
+.. code-block:: python
+
+  WAGTAIL_WORKFLOW_CANCEL_ON_PUBLISH = True
+
+This determines whether publishing a page with an ongoing workflow will cancel the workflow (if true) or leave the workflow unaffected (false).
+Disabling this could be useful if your site has long, multi-step workflows, and you want to be able to publish urgent page updates while the
+workflow continues to provide less urgent feedback.

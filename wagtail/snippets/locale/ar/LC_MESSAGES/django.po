@@ -5,14 +5,15 @@
 # Translators:
 # abdulaziz alfuhigi <abajall@gmail.com>, 2018
 # Ahmad Kiswani <kiswani.ahmad@gmail.com>, 2016
+# Ahmed Miske Sidi Med <boutien321@gmail.com>, 2020
 # ROGER MICHAEL ASHLEY ALLEN <rogermaallen@gmail.com>, 2015
 # ultraify media <ultraify@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 17:59+0100\n"
-"PO-Revision-Date: 2019-10-16 17:05+0000\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:37+0000\n"
 "Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/torchbox/wagtail/language/"
 "ar/)\n"
@@ -23,8 +24,14 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
+msgid "Delete"
+msgstr "احذف"
+
+msgid "Save"
+msgstr "احفظ"
+
 msgid "Wagtail snippets"
-msgstr "قصاصات"
+msgstr "قصاصات Wagtail"
 
 msgid "Choose"
 msgstr "اختر"
@@ -46,6 +53,9 @@ msgstr ""
 "\"%(wagtailsnippets_create_snippet_url)s\" target=\"_blank\" rel=\"noopener "
 "noreferrer\">تنشءواحد الان</a>؟"
 
+msgid "Saving…"
+msgstr "يتم الحفظ…"
+
 #, python-format
 msgid "Delete %(snippet_type_name)s"
 msgstr "خذف %(snippet_type_name)s"
@@ -62,7 +72,10 @@ msgid "Are you sure you want to delete %(count)s %(snippet_type_name)s?"
 msgstr "هل أنت متأكد أنك تريد حذف%(count)s %(snippet_type_name)s ؟"
 
 msgid "Yes, delete"
-msgstr "نعم احذف"
+msgstr "نعم, احذف"
+
+msgid "No, don't delete"
+msgstr "لا, لا تذف"
 
 #, python-format
 msgid "New  %(snippet_type_name)s"
@@ -71,11 +84,8 @@ msgstr "جديد %(snippet_type_name)s"
 msgid "New"
 msgstr "جديد"
 
-msgid "Saving…"
-msgstr "يتم الحفظ…"
-
-msgid "Save"
-msgstr "احفظ"
+msgid "Actions"
+msgstr "النشاطات"
 
 #, python-format
 msgid "Editing %(snippet_type_name)s - %(instance)s"
@@ -83,9 +93,6 @@ msgstr "تحرير %(snippet_type_name)s - %(instance)s"
 
 msgid "Editing"
 msgstr "تحرير"
-
-msgid "Delete"
-msgstr "احذف"
 
 msgid "Usage"
 msgstr "استعمال"

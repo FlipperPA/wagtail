@@ -1,4 +1,10 @@
+import re
+
+from html import unescape
+
 from django.db.models import Model
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 
 from wagtail.core.rich_text.feature_registry import FeatureRegistry
@@ -32,6 +38,19 @@ def expand_db_html(html):
     return FRONTEND_REWRITER(html)
 
 
+def get_text_for_indexing(richtext):
+    """
+    Return a plain text version of a rich text string, suitable for search indexing;
+    like Django's strip_tags, but ensures that whitespace is left between block elements
+    so that <p>hello</p><p>world</p> gives "hello world", not "helloworld".
+    """
+    # insert space after </p>, </h1> - </h6>, </li> and </blockquote> tags
+    richtext = re.sub(r'(</(p|h\d|li|blockquote)>)', r'\1 ', richtext, flags=re.IGNORECASE)
+    # also insert space after <br /> and <hr />
+    richtext = re.sub(r'(<(br|hr)\s*/>)', r'\1 ', richtext, flags=re.IGNORECASE)
+    return unescape(strip_tags(richtext).strip())
+
+
 class RichText:
     """
     A custom object used to represent a renderable rich text value.
@@ -43,7 +62,7 @@ class RichText:
         self.source = (source or '')
 
     def __html__(self):
-        return '<div class="rich-text">' + expand_db_html(self.source) + '</div>'
+        return render_to_string('wagtailcore/shared/richtext.html', {'html': expand_db_html(self.source)})
 
     def __str__(self):
         return mark_safe(self.__html__())

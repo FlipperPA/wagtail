@@ -30,32 +30,55 @@ Add ``"wagtail.contrib.routable_page"`` to your INSTALLED_APPS:
 The basics
 ==========
 
-To use ``RoutablePageMixin``, you need to make your class inherit from both :class:`wagtail.contrib.routable_page.models.RoutablePageMixin` and :class:`wagtail.core.models.Page`, then define some view methods and decorate them with ``wagtail.contrib.routable_page.models.route``.
+To use ``RoutablePageMixin``, you need to make your class inherit from both :class:`wagtail.contrib.routable_page.models.RoutablePageMixin` and :class:`wagtail.core.models.Page`, then define some view methods and decorate them with ``wagtail.contrib.routable_page.models.route``. These view methods behave like ordinary Django view functions, and must return an ``HttpResponse`` object; typically this is done through a call to ``django.shortcuts.render``.
 
-Here's an example of an ``EventPage`` with three views:
+Here's an example of an ``EventIndexPage`` with three views, assuming that an ``EventPage`` model with an ``event_date`` field has been defined elsewhere:
 
 .. code-block:: python
 
+    import datetime
+    from django.http import JsonResponse
+    from wagtail.core.fields import RichTextField
     from wagtail.core.models import Page
     from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 
 
-    class EventPage(RoutablePageMixin, Page):
-        ...
+    class EventIndexPage(RoutablePageMixin, Page):
+
+        # Routable pages can have fields like any other - here we would
+        # render the intro text on a template with {{ page.intro|richtext }}
+        intro = RichTextField()
 
         @route(r'^$') # will override the default Page serving mechanism
         def current_events(self, request):
             """
             View function for the current events page
             """
-            ...
+            events = EventPage.objects.live().filter(event_date__gte=datetime.date.today())
+
+            # NOTE: We can use the RoutablePageMixin.render() method to render
+            # the page as normal, but with some of the context values overridden
+            return self.render(request, context_overrides={
+                'title': "Current events",
+                'events': events,
+            })
 
         @route(r'^past/$')
         def past_events(self, request):
             """
             View function for the past events page
             """
-            ...
+            events = EventPage.objects.live().filter(event_date__lt=datetime.date.today())
+
+            # NOTE: We are overriding the template here, as well as few context values
+            return self.render(
+                request,
+                context_overrides={
+                    'title': "Past events",
+                    'events': events,
+                },
+                template="events/event_index_historical.html",
+            )
 
         # Multiple routes!
         @route(r'^year/(\d+)/$')
@@ -64,7 +87,48 @@ Here's an example of an ``EventPage`` with three views:
             """
             View function for the events for year page
             """
-            ...
+            if year is None:
+                year = datetime.date.today().year
+
+            events = EventPage.objects.live().filter(event_date__year=year)
+
+            return self.render(request, context_overrides={
+                'title': "Events for %d" % year,
+                'events': events,
+            })
+
+        @route(r'^year/(\d+)/count/$')
+        def count_for_year(self, request, year=None):
+            """
+            View function that returns a simple JSON response that
+            includes the number of events scheduled for a specific year
+            """
+            events = EventPage.objects.live().filter(event_date__year=year)
+
+            # NOTE: The usual template/context rendering process is irrelevant
+            # here, so we'll just return a HttpResponse directly
+            return JsonResponse({'count': events.count()})
+
+
+Rendering other pages
+=====================
+
+Another way of returning an ``HttpResponse`` is to call the ``serve`` method of another page. (Calling a page's own ``serve`` method within a view method is not valid, as the view method is already being called within ``serve``, and this would create a circular definition).
+
+For example, ``EventIndexPage`` could be extended with a ``next/`` route that displays the page for the next event:
+
+.. code-block:: python
+
+    @route(r'^next/$')
+    def next_event(self, request):
+        """
+        Display the page for the next event
+        """
+        future_events = EventPage.objects.live().filter(event_date__gt=datetime.date.today())
+        next_event = future_events.order_by('event_date').first()
+
+        return next_event.serve(request)
+
 
 Reversing URLs
 ==============
@@ -118,6 +182,8 @@ The ``RoutablePageMixin`` class
 
 .. automodule:: wagtail.contrib.routable_page.models
 .. autoclass:: RoutablePageMixin
+
+    .. automethod:: render
 
     .. automethod:: get_subpage_urls
 

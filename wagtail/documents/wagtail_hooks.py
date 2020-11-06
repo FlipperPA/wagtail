@@ -1,18 +1,18 @@
 from django.conf import settings
-from django.conf.urls import include, url
 from django.template.response import TemplateResponse
-from django.urls import reverse
+from django.urls import include, path, reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext, ungettext
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
+
 from wagtail.admin.menu import MenuItem
 from wagtail.admin.navigation import get_site_for_user
 from wagtail.admin.rich_text import HalloPlugin
 from wagtail.admin.search import SearchArea
 from wagtail.admin.site_summary import SummaryItem
-from wagtail.admin.staticfiles import versioned_static
 from wagtail.core import hooks
 from wagtail.core.models import BaseViewRestriction
 from wagtail.core.wagtail_hooks import require_wagtail_login
@@ -28,7 +28,7 @@ from wagtail.documents.rich_text.editor_html import EditorHTMLDocumentLinkConver
 @hooks.register('register_admin_urls')
 def register_admin_urls():
     return [
-        url(r'^documents/', include(admin_urls, namespace='wagtaildocs')),
+        path('documents/', include(admin_urls, namespace='wagtaildocs')),
     ]
 
 
@@ -50,7 +50,7 @@ def register_documents_menu_item():
         _('Documents'),
         reverse('wagtaildocs:index'),
         name='documents',
-        classnames='icon icon-doc-full-inverse',
+        icon_name='doc-full-inverse',
         order=400
     )
 
@@ -76,8 +76,8 @@ def register_document_feature(features):
         HalloPlugin(
             name='hallowagtaildoclink',
             js=[
-                versioned_static('wagtaildocs/js/document-chooser-modal.js'),
-                versioned_static('wagtaildocs/js/hallo-plugins/hallo-wagtaildoclink.js'),
+                'wagtaildocs/js/document-chooser-modal.js',
+                'wagtaildocs/js/hallo-plugins/hallo-wagtaildoclink.js',
             ],
         )
     )
@@ -85,8 +85,8 @@ def register_document_feature(features):
         'draftail', 'document-link', draftail_features.EntityFeature({
             'type': 'DOCUMENT',
             'icon': 'doc-full',
-            'description': ugettext('Document'),
-        }, js=[versioned_static('wagtaildocs/js/document-chooser-modal.js')])
+            'description': gettext('Document'),
+        }, js=['wagtaildocs/js/document-chooser-modal.js'])
     )
 
     features.register_converter_rule(
@@ -150,7 +150,7 @@ def describe_collection_docs(collection):
         url = reverse('wagtaildocs:index') + ('?collection_id=%d' % collection.id)
         return {
             'count': docs_count,
-            'count_text': ungettext(
+            'count_text': ngettext(
                 "%(count)s document",
                 "%(count)s documents",
                 docs_count

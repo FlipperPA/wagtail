@@ -2,10 +2,11 @@ import json
 
 from django import forms
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from wagtail.admin.staticfiles import versioned_static
 from wagtail.admin.widgets import AdminChooser
+from wagtail.admin.widgets.button import ListingButton
 
 
 class AdminSnippetChooser(AdminChooser):
@@ -48,3 +49,7 @@ class AdminSnippetChooser(AdminChooser):
             versioned_static('wagtailsnippets/js/snippet-chooser-modal.js'),
             versioned_static('wagtailsnippets/js/snippet-chooser.js'),
         ])
+
+
+class SnippetListingButton(ListingButton):
+    pass

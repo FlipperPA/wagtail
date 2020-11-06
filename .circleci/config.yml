@@ -15,19 +15,20 @@ jobs:
           paths:
             - ~/.local/
           key: pip-package-v1-{{ .Branch }}
-      - run: pipenv run flake8 wagtail
-      - run: pipenv run isort --check-only --diff --recursive wagtail
+      - run: pipenv run flake8
+      - run: pipenv run isort --check-only --diff .
       # Filter out known false positives, while preserving normal output and error codes.
       # See https://github.com/motet-a/jinjalint/issues/18.
       # And https://circleci.com/docs/2.0/configuration-reference/#default-shell-options.
       - run:
           shell: /bin/bash -e
           command: pipenv run jinjalint --parse-only wagtail | grep -v 'welcome_page.html:6:70' | tee /dev/tty | wc -l | grep -q '0'
+      - run: pipenv run doc8 docs
       - run: DATABASE_NAME=wagtail.db pipenv run python -u runtests.py
 
   frontend:
     docker:
-      - image: circleci/node:8.11.3
+      - image: circleci/node:10
     steps:
       - checkout
       - restore_cache:
@@ -43,7 +44,6 @@ jobs:
       - run: npm run lint:js
       - run: npm run lint:css
       - run: npm run test:unit:coverage -- --runInBand
-      - run: npm rebuild node-sass
       - run: npm run dist
       - run: bash <(curl -s https://codecov.io/bash) -F frontend
 

@@ -1,10 +1,9 @@
 from django.conf import settings
 from django.utils.module_loading import import_string
 
-from wagtail.admin.rich_text.editors.hallo import (  # NOQA
-    HalloFormatPlugin, HalloHeadingPlugin, HalloListPlugin, HalloPlugin, HalloRichTextArea
-)
 from wagtail.admin.rich_text.editors.draftail import DraftailRichTextArea  # NOQA
+from wagtail.admin.rich_text.editors.hallo import (  # NOQA
+    HalloFormatPlugin, HalloHeadingPlugin, HalloListPlugin, HalloPlugin, HalloRichTextArea)
 
 
 DEFAULT_RICH_TEXT_EDITORS = {
@@ -15,7 +14,8 @@ DEFAULT_RICH_TEXT_EDITORS = {
 
 
 def get_rich_text_editor_widget(name='default', features=None):
-    editor_settings = getattr(settings, 'WAGTAILADMIN_RICH_TEXT_EDITORS', DEFAULT_RICH_TEXT_EDITORS)
+    editor_settings = DEFAULT_RICH_TEXT_EDITORS.copy()
+    editor_settings.update(getattr(settings, 'WAGTAILADMIN_RICH_TEXT_EDITORS', {}))
 
     editor = editor_settings[name]
     options = editor.get('OPTIONS', None)

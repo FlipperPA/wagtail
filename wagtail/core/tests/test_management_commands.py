@@ -1,12 +1,14 @@
 from datetime import timedelta
 from io import StringIO
+from unittest import mock
 
+from django.contrib.auth import get_user_model
 from django.core import management
 from django.db import models
 from django.test import TestCase
 from django.utils import timezone
 
-from wagtail.core.models import Page, PageRevision
+from wagtail.core.models import Collection, Page, PageLogEntry, PageRevision
 from wagtail.core.signals import page_published, page_unpublished
 from wagtail.tests.testapp.models import EventPage, SimplePage
 
@@ -55,14 +57,21 @@ class TestFixTreeCommand(TestCase):
         homepage.depth = 12345
         homepage.save()
 
+        # also break the root collection's depth
+        root_collection = Collection.get_first_root_node()
+        root_collection.depth = 42
+        root_collection.save()
+
         # Check that its broken
         self.assertEqual(Page.objects.get(url_path='/home/').depth, 12345)
+        self.assertEqual(Collection.objects.get(id=root_collection.id).depth, 42)
 
         # Call command
         self.run_command()
 
         # Check if its fixed
         self.assertEqual(Page.objects.get(url_path='/home/').depth, old_depth)
+        self.assertEqual(Collection.objects.get(id=root_collection.id).depth, 1)
 
     def test_detects_orphans(self):
         events_index = Page.objects.get(url_path='/home/events/')
@@ -108,6 +117,16 @@ class TestFixTreeCommand(TestCase):
 
         # Check that christmas_page has been deleted
         self.assertFalse(Page.objects.filter(id=christmas_page.id).exists())
+
+    def test_remove_path_holes(self):
+        events_index = Page.objects.get(url_path='/home/events/')
+        # Delete the event page in path position 0001
+        Page.objects.get(path=events_index.path + '0001').delete()
+
+        self.run_command(full=True)
+        # the gap at position 0001 should have been closed
+        events_index = Page.objects.get(url_path='/home/events/')
+        self.assertTrue(Page.objects.filter(path=events_index.path + '0001').exists())
 
 
 class TestMovePagesCommand(TestCase):
@@ -181,7 +200,6 @@ class TestPublishScheduledPagesCommand(TestCase):
             signal_page[0] = instance
 
         page_published.connect(page_published_handler)
-
 
         page = SimplePage(
             title="Hello world!",
@@ -332,3 +350,135 @@ class TestPublishScheduledPagesCommand(TestCase):
 
         p = Page.objects.get(slug='hello-world')
         self.assertFalse(PageRevision.objects.filter(page=p, submitted_for_moderation=True).exists())
+
+
+class TestPurgeRevisionsCommand(TestCase):
+    fixtures = ['test.json']
+
+    def setUp(self):
+        # Find root page
+        self.root_page = Page.objects.get(id=2)
+        self.page = SimplePage(
+            title="Hello world!",
+            slug="hello-world",
+            content="hello",
+            live=False,
+        )
+        self.root_page.add_child(instance=self.page)
+        self.page.refresh_from_db()
+
+    def run_command(self, days=None):
+        if days:
+            days_input = '--days=' + str(days)
+            return management.call_command('purge_revisions', days_input, stdout=StringIO())
+        return management.call_command('purge_revisions', stdout=StringIO())
+
+    def test_latest_revision_not_purged(self):
+
+        revision_1 = self.page.save_revision()
+
+        revision_2 = self.page.save_revision()
+
+        self.run_command()
+
+        # revision 1 should be deleted, revision 2 should not be
+        self.assertNotIn(revision_1, PageRevision.objects.filter(page=self.page))
+        self.assertIn(revision_2, PageRevision.objects.filter(page=self.page))
+
+    def test_revisions_in_moderation_not_purged(self):
+
+        self.page.save_revision(submitted_for_moderation=True)
+
+        revision = self.page.save_revision()
+
+        self.run_command()
+
+        self.assertTrue(PageRevision.objects.filter(page=self.page, submitted_for_moderation=True).exists())
+
+        try:
+            from wagtail.core.models import Task, Workflow, WorkflowTask
+            workflow = Workflow.objects.create(name='test_workflow')
+            task_1 = Task.objects.create(name='test_task_1')
+            user = get_user_model().objects.first()
+            WorkflowTask.objects.create(workflow=workflow, task=task_1, sort_order=1)
+            workflow.start(self.page, user)
+            self.page.save_revision()
+            self.run_command()
+            # even though no longer the latest revision, the old revision should stay as it is
+            # attached to an in progress workflow
+            self.assertIn(revision, PageRevision.objects.filter(page=self.page))
+        except ImportError:
+            pass
+
+    def test_revisions_with_approve_go_live_not_purged(self):
+
+        approved_revision = self.page.save_revision(approved_go_live_at=timezone.now() + timedelta(days=1))
+
+        self.page.save_revision()
+
+        self.run_command()
+
+        self.assertIn(approved_revision, PageRevision.objects.filter(page=self.page))
+
+    def test_purge_revisions_with_date_cutoff(self):
+
+        old_revision = self.page.save_revision()
+
+        self.page.save_revision()
+
+        self.run_command(days=30)
+
+        # revision should not be deleted, as it is younger than 30 days
+        self.assertIn(old_revision, PageRevision.objects.filter(page=self.page))
+
+        old_revision.created_at = timezone.now() - timedelta(days=31)
+        old_revision.save()
+
+        self.run_command(days=30)
+
+        # revision is now older than 30 days, so should be deleted
+        self.assertNotIn(old_revision, PageRevision.objects.filter(page=self.page))
+
+
+class TestCreateLogEntriesFromRevisionsCommand(TestCase):
+    fixtures = ['test.json']
+
+    def setUp(self):
+        self.page = SimplePage(
+            title="Hello world!",
+            slug="hello-world",
+            content="hello",
+            live=False,
+            expire_at=timezone.now() - timedelta(days=1),
+        )
+
+        Page.objects.get(id=2).add_child(instance=self.page)
+
+        # Create empty revisions, which should not be converted to log entries
+        for i in range(3):
+            self.page.save_revision()
+
+        # Add another revision with a content change
+        self.page.title = "Hello world!!"
+        revision = self.page.save_revision()
+        revision.publish()
+
+        # clean up log entries
+        PageLogEntry.objects.all().delete()
+
+    def test_log_entries_created_from_revisions(self):
+        management.call_command('create_log_entries_from_revisions')
+
+        # Should not create entries for empty revisions.
+        self.assertListEqual(
+            list(PageLogEntry.objects.values_list("action", flat=True)),
+            ['wagtail.publish', 'wagtail.edit', 'wagtail.create']
+        )
+
+    def test_command_doesnt_crash_for_revisions_without_page_model(self):
+        with mock.patch(
+            'wagtail.core.models.ContentType.model_class',
+            return_value=None,
+        ):
+            management.call_command('create_log_entries_from_revisions')
+            self.assertEqual(PageLogEntry.objects.count(), 0)

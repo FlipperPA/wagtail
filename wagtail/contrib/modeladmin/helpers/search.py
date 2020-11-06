@@ -1,4 +1,5 @@
 import operator
+
 from functools import reduce
 
 from django.contrib.admin.utils import lookup_needs_distinct
@@ -43,7 +44,6 @@ class DjangoORMSearchHandler(BaseSearchHandler):
             if lookup_needs_distinct(opts, search_spec):
                 return queryset.distinct()
         return queryset
-
 
     @property
     def show_search_form(self):

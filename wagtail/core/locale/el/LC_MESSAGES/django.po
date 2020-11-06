@@ -10,13 +10,13 @@
 # serafeim <serafeim@torchbox.com>, 2014,2016
 # George Giannoulopoulos <vdotoree@yahoo.gr>, 2015
 # Wasilis Mandratzis-Walz, 2015
-# Wasilis Mandratzis-Walz, 2015
+# 79353a696ad19dc202b261b3067b7640_bec941e, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 17:59+0100\n"
-"PO-Revision-Date: 2019-10-16 17:05+0000\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-10-23 11:36+0000\n"
 "Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
 "Language-Team: Greek (http://www.transifex.com/torchbox/wagtail/language/"
 "el/)\n"
@@ -223,9 +223,6 @@ msgstr "Διαγραφή σελιδών με υποσελίδες"
 
 msgid "Lock"
 msgstr "Κλείδωμα"
-
-msgid "Lock/unlock any page"
-msgstr "Κλείδωμα/ξεκλείδωμα κάθε σελίδας"
 
 msgid "group"
 msgstr "ομάδα"

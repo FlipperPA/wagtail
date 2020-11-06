@@ -1,10 +1,10 @@
 from collections import OrderedDict
 
-from django.conf.urls import url
+from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.http import Http404
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import path, reverse
 from modelcluster.fields import ParentalKey
 from rest_framework import status
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
@@ -12,9 +12,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from wagtail.api import APIField
-from wagtail.core.models import Page
+from wagtail.core.models import Page, Site
 
-from .filters import ChildOfFilter, DescendantOfFilter, FieldsFilter, OrderingFilter, SearchFilter
+from .filters import (
+    ChildOfFilter, DescendantOfFilter, FieldsFilter, LocaleFilter, OrderingFilter, SearchFilter,
+    TranslationOfFilter)
 from .pagination import WagtailPagination
 from .serializers import BaseSerializer, PageSerializer, get_serializer_class
 from .utils import (
@@ -336,9 +338,9 @@ class BaseAPIViewSet(GenericViewSet):
         This returns a list of URL patterns for the endpoint
         """
         return [
-            url(r'^$', cls.as_view({'get': 'listing_view'}), name='listing'),
-            url(r'^(?P<pk>\d+)/$', cls.as_view({'get': 'detail_view'}), name='detail'),
-            url(r'^find/$', cls.as_view({'get': 'find_view'}), name='find'),
+            path('', cls.as_view({'get': 'listing_view'}), name='listing'),
+            path('<int:pk>/', cls.as_view({'get': 'detail_view'}), name='detail'),
+            path('find/', cls.as_view({'get': 'find_view'}), name='find'),
         ]
 
     @classmethod
@@ -367,12 +369,16 @@ class PagesAPIViewSet(BaseAPIViewSet):
         ChildOfFilter,
         DescendantOfFilter,
         OrderingFilter,
-        SearchFilter
+        SearchFilter,
+        TranslationOfFilter,
+        LocaleFilter,
     ]
     known_query_parameters = BaseAPIViewSet.known_query_parameters.union([
         'type',
         'child_of',
         'descendant_of',
+        'translation_of',
+        'locale',
     ])
     body_fields = BaseAPIViewSet.body_fields + [
         'title',
@@ -385,6 +391,7 @@ class PagesAPIViewSet(BaseAPIViewSet):
         'search_description',
         'first_published_at',
         'parent',
+        'locale',
     ]
     listing_default_fields = BaseAPIViewSet.listing_default_fields + [
         'title',
@@ -399,11 +406,31 @@ class PagesAPIViewSet(BaseAPIViewSet):
     name = 'pages'
     model = Page
 
+    @classmethod
+    def get_detail_default_fields(cls, model):
+        detail_default_fields = super().get_detail_default_fields(model)
+
+        # When i18n is disabled, remove "locale" from default fields
+        if not getattr(settings, 'WAGTAIL_I18N_ENABLED', False):
+            detail_default_fields.remove('locale')
+
+        return detail_default_fields
+
+    @classmethod
+    def get_listing_default_fields(cls, model):
+        listing_default_fields = super().get_listing_default_fields(model)
+
+        # When i18n is enabled, add "locale" to default fields
+        if getattr(settings, 'WAGTAIL_I18N_ENABLED', False):
+            listing_default_fields.append('locale')
+
+        return listing_default_fields
+
     def get_root_page(self):
         """
         Returns the page that is used when the `&child_of=root` filter is used.
         """
-        return self.request.site.root_page
+        return Site.find_for_request(self.request).root_page
 
     def get_base_queryset(self):
         """
@@ -416,8 +443,16 @@ class PagesAPIViewSet(BaseAPIViewSet):
         queryset = Page.objects.all().public().live()
 
         # Filter by site
-        if self.request.site:
-            queryset = queryset.descendant_of(self.request.site.root_page, inclusive=True)
+        site = Site.find_for_request(self.request)
+        if site:
+            base_queryset = queryset
+            queryset = base_queryset.descendant_of(site.root_page, inclusive=True)
+
+            # If internationalisation is enabled, include pages from other language trees
+            if getattr(settings, 'WAGTAIL_I18N_ENABLED', False):
+                for translation in site.root_page.get_translations():
+                    queryset |= base_queryset.descendant_of(translation, inclusive=True)
+
         else:
             # No sites configured
             queryset = queryset.none()
@@ -449,12 +484,13 @@ class PagesAPIViewSet(BaseAPIViewSet):
         return base.specific
 
     def find_object(self, queryset, request):
-        if 'html_path' in request.GET and request.site is not None:
+        site = Site.find_for_request(request)
+        if 'html_path' in request.GET and site is not None:
             path = request.GET['html_path']
             path_components = [component for component in path.split('/') if component]
 
             try:
-                page, _, _ = request.site.root_page.specific.route(request, path_components)
+                page, _, _ = site.root_page.specific.route(request, path_components)
             except Http404:
                 return
 

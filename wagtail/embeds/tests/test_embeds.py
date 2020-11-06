@@ -1,6 +1,7 @@
 import json
 import unittest
 import urllib.request
+
 from unittest.mock import patch
 from urllib.error import URLError
 
@@ -15,12 +16,13 @@ from wagtail.embeds.blocks import EmbedBlock, EmbedValue
 from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedNotFoundException, EmbedUnsupportedProviderException
 from wagtail.embeds.finders import get_finders
-from wagtail.embeds.finders.embedly import EmbedlyFinder as EmbedlyFinder
 from wagtail.embeds.finders.embedly import AccessDeniedEmbedlyException, EmbedlyException
+from wagtail.embeds.finders.embedly import EmbedlyFinder as EmbedlyFinder
 from wagtail.embeds.finders.oembed import OEmbedFinder as OEmbedFinder
 from wagtail.embeds.models import Embed
 from wagtail.embeds.templatetags.wagtailembeds_tags import embed_tag
 from wagtail.tests.utils import WagtailTestUtils
+
 
 try:
     import embedly  # noqa
@@ -94,7 +96,8 @@ class TestEmbeds(TestCase):
             'html': "<p>Blah blah blah</p>",
         }
 
-    def test_get_embed(self):
+    @override_settings(WAGTAILEMBEDS_RESPONSIVE_HTML=True)
+    def test_get_embed_responsive(self):
         embed = get_embed('www.test.com/1234', max_width=400, finder=self.dummy_finder)
 
         # Check that the embed is correct
@@ -121,6 +124,15 @@ class TestEmbeds(TestCase):
         # Look for the same embed with a different width, this should also increase hit count
         embed = get_embed('www.test.com/4321', finder=self.dummy_finder)
         self.assertEqual(self.hit_count, 3)
+
+    def test_get_embed_nonresponsive(self):
+        embed = get_embed('www.test.com/1234', max_width=400, finder=self.dummy_finder)
+
+        # Check that the embed is correct
+        self.assertEqual(embed.title, "Test: www.test.com/1234")
+        self.assertEqual(embed.type, 'video')
+        self.assertEqual(embed.width, 400)
+        self.assertFalse(embed.is_responsive)
 
     def dummy_finder_invalid_width(self, url, max_width=None):
         # Return a record with an invalid width
@@ -372,7 +384,7 @@ class TestOembed(TestCase):
         result = OEmbedFinder().find_embed("https://vimeo.com/217403396")
         self.assertEqual(result['type'], 'video')
         request = urlopen.call_args[0][0]
-        self.assertEqual(request.get_full_url().split('?')[0], "http://www.vimeo.com/api/oembed.json")
+        self.assertEqual(request.get_full_url().split('?')[0], "https://www.vimeo.com/api/oembed.json")
 
 
 class TestEmbedTag(TestCase):

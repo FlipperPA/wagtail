@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from wagtail.admin.auth import PermissionPolicyChecker
 from wagtail.admin.forms.search import SearchForm
@@ -15,6 +16,7 @@ from wagtail.images.formats import get_image_format
 from wagtail.images.forms import ImageInsertionForm, get_image_form
 from wagtail.images.permissions import permission_policy
 from wagtail.search import index as search_index
+
 
 permission_checker = PermissionPolicyChecker(permission_policy)
 
@@ -56,8 +58,6 @@ def get_chooser_context(request):
     collections = Collection.objects.all()
     if len(collections) < 2:
         collections = None
-    else:
-        collections = Collection.order_for_display(collections)
 
     return {
         'searchform': SearchForm(),
@@ -112,7 +112,7 @@ def chooser(request):
         paginator = Paginator(images, per_page=CHOOSER_PAGE_SIZE)
         images = paginator.get_page(request.GET.get('p'))
 
-        return render(request, "wagtailimages/chooser/results.html", {
+        return TemplateResponse(request, "wagtailimages/chooser/results.html", {
             'images': images,
             'is_searching': is_searching,
             'query_string': q,

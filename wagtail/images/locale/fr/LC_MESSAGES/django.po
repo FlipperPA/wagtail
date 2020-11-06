@@ -8,7 +8,8 @@
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2015-2018
 # fpoulain <fpoulain@metrodore.fr>, 2018
 # Léo <leo@naeka.fr>, 2016
-# Loic Teixeira <hello@lta.me>, 2018
+# Loic Teixeira, 2020
+# Loic Teixeira, 2018
 # nahuel, 2014
 # nahuel, 2014
 # Sebastien Andrivet <sebastien@andrivet.com>, 2016
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 17:59+0100\n"
-"PO-Revision-Date: 2019-10-16 17:05+0000\n"
-"Last-Translator: Matt Westcott <matthew@torchbox.com>\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-07-31 11:14+0000\n"
+"Last-Translator: Loic Teixeira\n"
 "Language-Team: French (http://www.transifex.com/torchbox/wagtail/language/"
 "fr/)\n"
 "MIME-Version: 1.0\n"
@@ -30,6 +31,9 @@ msgstr ""
 
 msgid "Wagtail images"
 msgstr "Images Wagtail"
+
+msgid "GIF, JPEG, PNG, WEBP"
+msgstr "GIF, JPEG, PNG, WEBP "
 
 #, python-format
 msgid ""
@@ -238,7 +242,7 @@ msgstr "Non, ne pas supprimer"
 
 #, python-format
 msgid "Editing image %(title)s"
-msgstr "Édition de l'image %(title)s"
+msgstr "Modification de l'image %(title)s"
 
 msgid "Editing"
 msgstr "Modification"
@@ -279,6 +283,12 @@ msgstr "Utilisation"
 
 msgid "Images"
 msgstr "Images"
+
+msgid "Popular Tags:"
+msgstr "Mots-clés populaires :"
+
+msgid "Clear choice"
+msgstr "Effacer ce choix"
 
 msgid "pixels"
 msgstr "pixels"
@@ -375,7 +385,7 @@ msgstr "Erreur du serveur"
 
 msgid "Report this error to your webmaster with the following information:"
 msgstr ""
-"Signaler cette erreur à votre webmaster avec les informations suivantes :"
+"Signalez cette erreur à votre webmaster avec les informations suivantes :"
 
 msgid "Image updated."
 msgstr "Image mise à jour."

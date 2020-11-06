@@ -8,19 +8,19 @@
 # Feng Wang <wangfeng.w@gmail.com>, 2015
 # First Last <abc+github@mynook.info>, 2019
 # hanfeng <appweb.cn@gmail.com>, 2014
-# jszsj <zhushajun@gmail.com>, 2017
+# 祝沙军 <zhushajun@gmail.com>, 2017
 # listeng, 2016
 # Aosp T, 2016
 # Vincent Zhao <zhaopu2008@gmail.com>, 2017
-# jszsj <zhushajun@gmail.com>, 2017
-# 汇民 王 <whuim@qq.com>, 2017-2018
+# 祝沙军 <zhushajun@gmail.com>, 2017
+# 汇民 王 <whuim@qq.com>, 2017-2018,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 18:00+0100\n"
-"PO-Revision-Date: 2019-11-01 02:59+0000\n"
-"Last-Translator: First Last <abc+github@mynook.info>\n"
+"POT-Creation-Date: 2020-10-23 12:34+0100\n"
+"PO-Revision-Date: 2020-08-02 10:52+0000\n"
+"Last-Translator: 汇民 王 <whuim@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/torchbox/wagtail/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +90,15 @@ msgstr "提交时间"
 
 msgid "form submission"
 msgstr "提交表格"
+
+msgid "form submissions"
+msgstr "提交表单"
+
+msgid "name"
+msgstr "名称"
+
+msgid "Safe name of the form field, the label converted to ascii_snake_case"
+msgstr "表单字段的安全名称，标签已转换为字母蛇行命名法（ascii_snake_case）"
 
 msgid "label"
 msgstr "标签"
@@ -188,6 +197,9 @@ msgstr "表格数据 <span>%(form_title)s</span>"
 
 msgid "Filter"
 msgstr "过滤器"
+
+msgid "Download XLSX"
+msgstr "下载XLSX"
 
 msgid "Download CSV"
 msgstr "下载为CSV"

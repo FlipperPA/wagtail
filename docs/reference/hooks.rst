@@ -27,7 +27,7 @@ Alternatively, ``hooks.register`` can be called as an ordinary function, passing
 
   hooks.register('name_of_hook', my_hook_function)
 
-If you need your hooks to run in a particular order, you can pass the ``order`` parameter:
+If you need your hooks to run in a particular order, you can pass the ``order`` parameter.  If order is not specified then the hooks proceed in the order given by INSTALLED_APPS. Wagtail uses hooks internally, too, so you need to be aware of order when overriding built-in Wagtail functionality (i.e. removing default summary items):
 
 .. code-block:: python
 
@@ -43,12 +43,47 @@ If you need your hooks to run in a particular order, you can pass the ``order`` 
   def yet_another_hook_function(arg1, arg2...)
       # your code here
 
+Unit testing hooks
+------------------
+
+Hooks are usually registered on startup and can't be changed at runtime. But when writing unit tests, you might want to register a hook
+function just for a single test or block of code and unregister it so that it doesn't run when other tests are run.
+
+You can register hooks temporarily using the ``hooks.register_temporarily`` function, this can be used as both a decorator and a context
+manager. Here's an example of how to register a hook function for just a single test:
+
+.. code-block:: python
+
+  def my_hook_function():
+      ...
+
+  class MyHookTest(TestCase):
+
+      @hooks.register_temporarily('name_of_hook', my_hook_function)
+      def test_my_hook_function(self):
+          # Test with the hook registered here
+          ...
+
+And here's an example of registering a hook function for a single block of code:
+
+.. code-block:: python
+
+
+  def my_hook_function():
+      ...
+
+  with hooks.register_temporarily('name_of_hook', my_hook_function):
+      # Hook is registered here
+      ..
+
+  # Hook is unregistered here
+
+
 The available hooks are listed below.
 
 .. contents::
     :local:
     :depth: 1
-
 
 Admin modules
 -------------
@@ -119,7 +154,7 @@ Hooks for building new areas of the admin interface (alongside pages, images, do
   A numeric count of items in this collection
 
 ``count_text``
-  A human-readable string describing the number of items in this collection, such as "3 documents". (Sites with multi-language support should return a translatable string here, most likely using the ``django.utils.translation.ungettext`` function.)
+  A human-readable string describing the number of items in this collection, such as "3 documents". (Sites with multi-language support should return a translatable string here, most likely using the ``django.utils.translation.ngettext`` function.)
 
 ``url`` (optional)
   A URL to an index page that lists the objects being described.
@@ -160,7 +195,9 @@ Hooks for building new areas of the admin interface (alongside pages, images, do
   :attrs: additional HTML attributes to apply to the link
   :order: an integer which determines the item's position in the menu
 
-  ``MenuItem`` can be subclassed to customise the HTML output, specify JavaScript files required by the menu item, or conditionally show or hide the item for specific requests (for example, to apply permission checks); see the source code (``wagtail/admin/menu.py``) for details.
+  For menu items that are only available to superusers, the subclass ``wagtail.admin.menu.AdminOnlyMenuItem`` can be used in place of ``MenuItem``.
+
+  ``MenuItem`` can be further subclassed to customise the HTML output, specify JavaScript files required by the menu item, or conditionally show or hide the item for specific requests (for example, to apply permission checks); see the source code (``wagtail/admin/menu.py``) for details.
 
   .. code-block:: python
 
@@ -184,7 +221,7 @@ Hooks for building new areas of the admin interface (alongside pages, images, do
   .. code-block:: python
 
     from django.http import HttpResponse
-    from django.conf.urls import url
+    from django.urls import path
 
     from wagtail.core import hooks
 
@@ -196,7 +233,7 @@ Hooks for building new areas of the admin interface (alongside pages, images, do
     @hooks.register('register_admin_urls')
     def urlconf_time():
       return [
-        url(r'^how_did_you_almost_know_my_name/$', admin_view, name='frank'),
+        path('how_did_you_almost_know_my_name/', admin_view, name='frank'),
       ]
 
 
@@ -222,6 +259,22 @@ Hooks for building new areas of the admin interface (alongside pages, images, do
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   As ``construct_main_menu``, but modifies the 'Settings' sub-menu rather than the top-level menu.
+
+
+.. _register_reports_menu_item:
+
+``register_reports_menu_item``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  As ``register_admin_menu_item``, but registers menu items into the 'Reports' sub-menu rather than the top-level menu.
+
+
+.. _construct_reports_menu:
+
+``construct_reports_menu``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  As ``construct_main_menu``, but modifies the 'Reports' sub-menu rather than the top-level menu.
 
 
 .. _register_admin_search_area:
@@ -424,6 +477,18 @@ Hooks for customising the way users are directed through the process of creating
     def do_after_page_create(request, page):
         return HttpResponse("Congrats on making content!", content_type="text/plain")
 
+  If you set attributes on a ``Page`` object, you should also call ``save_revision()``, since the edit and index view pick up their data from the revisions table rather than the actual saved page record.
+
+  .. code-block:: python
+
+      @hooks.register('after_create_page')
+      def set_attribute_after_page_create(request, page)
+         page.title = 'Persistent Title'
+         new_revision = page.save_revision()
+         if page.live:
+             # page has been created and published at the same time,
+             # so ensure that the updated title is on the published version too
+             new_revision.publish()
 
 .. _before_create_page:
 
@@ -487,6 +552,46 @@ Hooks for customising the way users are directed through the process of creating
   Uses the same behaviour as ``before_create_page``.
 
 
+.. _after_publish_page:
+
+``after_publish_page``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Do something with a ``Page`` object after it has been published via page create view or page edit view.
+
+  The function does not have to return anything, but if an object with a ``status_code`` property is returned, Wagtail will use it as a response object and skip the rest of the view.
+
+
+.. _before_publish_page:
+
+``before_publish_page``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Do something with a ``Page`` object before it has been published via page create view or page edit view.
+
+  The function does not have to return anything, but if an object with a ``status_code`` property is returned, Wagtail will use it as a response object and skip the rest of the view.
+
+
+.. _after_unpublish_page:
+
+``after_unpublish_page``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called after unpublish action in "unpublish" view passing in the request and the page object.
+
+  The function does not have to return anything, but if an object with a ``status_code`` property is returned, Wagtail will use it as a response object and skip the rest of the view.
+
+
+.. _before_unpublish_page:
+
+``before_unpublish_page``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called before unpublish action in "unpublish" view passing in the request and the page object.
+
+  The function does not have to return anything, but if an object with a ``status_code`` property is returned, Wagtail will use it as a response object and skip the rest of the view.
+
+
 .. _after_copy_page:
 
 ``after_copy_page``
@@ -521,6 +626,31 @@ Hooks for customising the way users are directed through the process of creating
 
   Uses the same behaviour as ``before_create_page``.
 
+
+.. _before_convert_alias_page:
+
+``before_convert_alias_page``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called at the beginning of the ``convert_alias`` view, which is responsible for converting alias pages into normal Wagtail pages.
+
+  The request and the page being converted are passed in as arguments to the hook.
+
+  The function does not have to return anything, but if an object with a ``status_code`` property is returned, Wagtail will use it as a response object and skip the rest of the view.
+
+
+.. _after_convert_alias_page:
+
+``after_convert_alias_page``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Do something with a ``Page`` object after it has been converted from an alias.
+
+  The request and the page that was just converted are passed in as arguments to the hook.
+
+  The function does not have to return anything, but if an object with a ``status_code`` property is returned, Wagtail will use it as a response object and skip the rest of the view.
+
+
 .. _register_page_action_menu_item:
 
 ``register_page_action_menu_item``
@@ -532,11 +662,13 @@ Hooks for customising the way users are directed through the process of creating
   :label: the displayed text of the menu item
   :get_url: a method which returns a URL for the menu item to link to; by default, returns ``None`` which causes the menu item to behave as a form submit button instead
   :name: value of the ``name`` attribute of the submit button, if no URL is specified
+  :icon_name: icon to display against the menu item
+  :classname: a ``class`` attribute value to add to the button element
   :is_shown: a method which returns a boolean indicating whether the menu item should be shown; by default, true except when editing a locked page
   :template: path to a template to render to produce the menu item HTML
   :get_context: a method that returns a context dictionary to pass to the template
   :render_html: a method that returns the menu item HTML; by default, renders ``template`` with the context returned from ``get_context``
-  :Media: an inner class defining Javascript and CSS to import when this menu item is shown - see `Django form media <https://docs.djangoproject.com/en/stable/topics/forms/media/>`_
+  :Media: an inner class defining JavaScript and CSS to import when this menu item is shown - see `Django form media <https://docs.djangoproject.com/en/stable/topics/forms/media/>`_
 
   The ``get_url``, ``is_shown``, ``get_context`` and ``render_html`` methods all accept a request object and a context dictionary containing the following fields:
 
@@ -598,9 +730,9 @@ Hooks for customising the way users are directed through the process of creating
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   Modify the final list of page listing buttons in the page explorer. The
-  callable passed to this hook receives a list of ``Button`` objects, a request
-  object and a context dictionary as per ``register_page_action_menu_item``,
-  and should modify the list of menu items in-place.
+  callable passed to this hook receives a list of ``PageListingButton`` objects, a page,
+  a page perms object, and a context dictionary as per ``register_page_listing_buttons``,
+  and should modify the list of listing items in-place.
 
   .. code-block:: python
 
@@ -814,12 +946,19 @@ Page explorer
     from wagtail.admin import widgets as wagtailadmin_widgets
 
     @hooks.register('register_page_listing_buttons')
-    def page_listing_buttons(page, page_perms, is_parent=False):
+    def page_listing_buttons(page, page_perms, is_parent=False, next_url=None):
         yield wagtailadmin_widgets.PageListingButton(
             'A page listing button',
             '/goes/to/a/url/',
             priority=10
         )
+
+  The arguments passed to the hook are as follows:
+
+  * ``page`` - the page object to generate the button for
+  * ``page_perms`` - a ``PagePermissionTester`` object that can be queried to determine the current user's permissions on the given page
+  * ``is_parent`` - if true, this button is being rendered for the parent page being displayed at the top of the listing
+  * ``next_url`` - the URL that the linked action should redirect back to on completion of the action, if the view supports it
 
   The ``priority`` argument controls the order the buttons are displayed in. Buttons are ordered from low to high priority, so a button with ``priority=10`` will be displayed before a button with ``priority=20``.
 
@@ -838,12 +977,19 @@ Page explorer
     from wagtail.admin import widgets as wagtailadmin_widgets
 
     @hooks.register('register_page_listing_more_buttons')
-    def page_listing_more_buttons(page, page_perms, is_parent=False):
+    def page_listing_more_buttons(page, page_perms, is_parent=False, next_url=None):
         yield wagtailadmin_widgets.Button(
             'A dropdown button',
             '/goes/to/a/url/',
             priority=60
         )
+
+  The arguments passed to the hook are as follows:
+
+  * ``page`` - the page object to generate the button for
+  * ``page_perms`` - a ``PagePermissionTester`` object that can be queried to determine the current user's permissions on the given page
+  * ``is_parent`` - if true, this button is being rendered for the parent page being displayed at the top of the listing
+  * ``next_url`` - the URL that the linked action should redirect back to on completion of the action, if the view supports it
 
   The ``priority`` argument controls the order the buttons are displayed in the dropdown. Buttons are ordered from low to high priority, so a button with ``priority=10`` will be displayed before a button with ``priority=60``.
 
@@ -863,18 +1009,19 @@ Buttons with dropdown lists
     from wagtail.admin import widgets as wagtailadmin_widgets
 
     @hooks.register('register_page_listing_buttons')
-    def page_custom_listing_buttons(page, page_perms, is_parent=False):
+    def page_custom_listing_buttons(page, page_perms, is_parent=False, next_url=None):
         yield wagtailadmin_widgets.ButtonWithDropdownFromHook(
             'More actions',
             hook_name='my_button_dropdown_hook',
             page=page,
             page_perms=page_perms,
             is_parent=is_parent,
+            next_url=next_url,
             priority=50
         )
 
     @hooks.register('my_button_dropdown_hook')
-    def page_custom_listing_more_buttons(page, page_perms, is_parent=False):
+    def page_custom_listing_more_buttons(page, page_perms, is_parent=False, next_url=None):
         if page_perms.can_move():
             yield wagtailadmin_widgets.Button('Move', reverse('wagtailadmin_pages:move', args=[page.id]), priority=10)
         if page_perms.can_delete():
@@ -918,3 +1065,255 @@ Document serving
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
   Called when Wagtail is about to serve a document. The callable passed into the hook will receive the document object and the request object. If the callable returns an ``HttpResponse``, that response will be returned immediately to the user, instead of serving the document. Note that this hook will be skipped if the :ref:`WAGTAILDOCS_SERVE_METHOD <wagtaildocs_serve_method>` setting is set to ``direct``.
+
+
+Snippets
+--------
+
+Hooks for working with registered Snippets.
+
+.. _after_edit_snippet:
+
+``after_edit_snippet``
+~~~~~~~~~~~~~~~~~~~~~~
+
+  Called when a Snippet is edited. The callable passed into the hook will receive the model instance, the request object. If the callable returns an ``HttpResponse``, that response will be returned immediately to the user, and Wagtail will not proceed to call ``redirect()`` to the listing view.
+
+  .. code-block:: python
+
+    from django.http import HttpResponse
+
+    from wagtail.core import hooks
+
+    @hooks.register('after_edit_snippet')
+    def after_snippet_update(request, instance):
+        return HttpResponse(f"Congrats on editing a snippet with id {instance.pk}", content_type="text/plain")
+
+.. _before_edit_snippet:
+
+``before_edit_snippet``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called at the beginning of the edit snippet view. The callable passed into the hook will receive the model instance, the request object. If the callable returns an ``HttpResponse``, that response will be returned immediately to the user, and Wagtail will not proceed to call ``redirect()`` to the listing view.
+
+  .. code-block:: python
+
+    from django.http import HttpResponse
+
+    from wagtail.core import hooks
+
+    @hooks.register('before_edit_snippet')
+    def block_snippet_edit(request, instance):
+        if isinstance(instance, RestrictedSnippet) and instance.prevent_edit:
+            return HttpResponse("Sorry, you can't edit this snippet", content_type="text/plain")
+
+.. _after_create_snippet:
+
+``after_create_snippet``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called when a Snippet is created. ``after_create_snippet`` and
+  ``after_edit_snippet`` work in identical ways. The only difference is where
+  the hook is called.
+
+.. _before_create_snippet:
+
+``before_create_snippet``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called at the beginning of the create snippet view. Works in a similar way to `before_edit_snippet` except the model is passed as an argument instead of an instance.
+
+.. _after_delete_snippet:
+
+``after_delete_snippet``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called when a Snippet is deleted. The callable passed into the hook will receive the model instance(s) as a queryset along with the request object. If the callable returns an ``HttpResponse``, that response will be returned immediately to the user, and Wagtail will not proceed to call ``redirect()`` to the listing view.
+
+  .. code-block:: python
+
+    from django.http import HttpResponse
+
+    from wagtail.core import hooks
+
+    @hooks.register('after_delete_snippet')
+    def after_snippet_delete(request, instances):
+        # "instances" is a QuerySet
+        total = len(instances)
+        return HttpResponse(f"{total} snippets have been deleted", content_type="text/plain")
+
+.. _before_delete_snippet:
+
+``before_delete_snippet``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Called at the beginning of the delete snippet view. The callable passed into the hook will receive the model instance(s) as a queryset along with the request object. If the callable returns an ``HttpResponse``, that response will be returned immediately to the user, and Wagtail will not proceed to call ``redirect()`` to the listing view.
+
+  .. code-block:: python
+
+    from django.http import HttpResponse
+
+    from wagtail.core import hooks
+
+    @hooks.register('before_delete_snippet')
+    def before_snippet_delete(request, instances):
+        # "instances" is a QuerySet
+        total = len(instances)
+
+        if request.method == 'POST':
+          # Override the deletion behaviour
+          instances.delete()
+
+          return HttpResponse(f"{total} snippets have been deleted", content_type="text/plain")
+
+.. _register_snippet_action_menu_item:
+
+``register_snippet_action_menu_item``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Add an item to the popup menu of actions on the snippet creation and edit views.
+  The callable passed to this hook must return an instance of
+  ``wagtail.snippets.action_menu.ActionMenuItem``. The following attributes and
+  methods are available to be overridden on subclasses of ``ActionMenuItem``:
+
+  :order: an integer (default 100) which determines the item's position in the menu. Can also be passed as a keyword argument to the object constructor. The lowest-numbered item in this sequence will be selected as the default menu item; as standard, this is "Save draft" (which has an ``order`` of 0).
+  :label: the displayed text of the menu item
+  :get_url: a method which returns a URL for the menu item to link to; by default, returns ``None`` which causes the menu item to behave as a form submit button instead
+  :name: value of the ``name`` attribute of the submit button if no URL is specified
+  :icon_name: icon to display against the menu item
+  :classname: a ``class`` attribute value to add to the button element
+  :is_shown: a method which returns a boolean indicating whether the menu item should be shown; by default, true except when editing a locked page
+  :template: the path to a template to render to produce the menu item HTML
+  :get_context: a method that returns a context dictionary to pass to the template
+  :render_html: a method that returns the menu item HTML; by default, renders ``template`` with the context returned from ``get_context``
+  :Media: an inner class defining Javascript and CSS to import when this menu item is shown - see `Django form media <https://docs.djangoproject.com/en/stable/topics/forms/media/>`_
+
+  The ``get_url``, ``is_shown``, ``get_context`` and ``render_html`` methods all accept a request object and a context dictionary containing the following fields:
+
+  :view: name of the current view: ``'create'`` or ``'edit'``
+  :model: The snippets model class
+  :instance: For ``view`` = ``'edit'``, the instance being edited
+
+  .. code-block:: python
+
+    from wagtail.core import hooks
+    from wagtail.snippets.action_menu import ActionMenuItem
+
+    class GuacamoleMenuItem(ActionMenuItem):
+        name = 'action-guacamole'
+        label = "Guacamole"
+
+        def get_url(self, request, context):
+            return "https://www.youtube.com/watch?v=dNJdJIwCF_Y"
+
+
+    @hooks.register('register_snippet_action_menu_item')
+    def register_guacamole_menu_item():
+        return GuacamoleMenuItem(order=10)
+
+.. _construct_snippet_action_menu:
+
+``construct_snippet_action_menu``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Modify the final list of action menu items on the snippet creation and edit views.
+  The callable passed to this hook receives a list of ``ActionMenuItem`` objects, a
+  request object and a context dictionary as per ``register_snippet_action_menu_item``,
+  and should modify the list of menu items in-place.
+
+  .. code-block:: python
+
+    @hooks.register('construct_snippet_action_menu')
+    def remove_delete_option(menu_items, request, context):
+        menu_items[:] = [item for item in menu_items if item.name != 'delete']
+
+
+  The ``construct_snippet_action_menu`` hook is called after the menu items have been
+  sorted by their order attributes, and so setting a menu item's order will have no
+  effect at this point. Instead, items can be reordered by changing their position in
+  the list, with the first item being selected as the default action. For example, to
+  change the default action to Delete:
+
+  .. code-block:: python
+
+    @hooks.register('construct_snippet_action_menu')
+    def make_delete_default_action(menu_items, request, context):
+        for (index, item) in enumerate(menu_items):
+            if item.name == 'delete':
+                # move to top of list
+                menu_items.pop(index)
+                menu_items.insert(0, item)
+                break
+
+.. _register_snippet_listing_buttons:
+
+``register_snippet_listing_buttons``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Add buttons to the actions list for a snippet in the snippets listing. This is useful when adding custom actions to the listing, such as translations or a complex workflow.
+
+  This example will add a simple button to the listing:
+
+  .. code-block:: python
+
+    from wagtail.snippets import widgets as wagtailsnippets_widgets
+
+    @hooks.register('register_snippet_listing_buttons')
+    def snippet_listing_buttons(snippet, user, next_url=None):
+        yield wagtailsnippets_widgets.SnippetListingButton(
+            'A page listing button',
+            '/goes/to/a/url/',
+            priority=10
+        )
+
+  The arguments passed to the hook are as follows:
+
+  * ``snippet`` - the snippet object to generate the button for
+  * ``user`` - the user who is viewing the snippets listing
+  * ``next_url`` - the URL that the linked action should redirect back to on completion of the action, if the view supports it
+
+  The ``priority`` argument controls the order the buttons are displayed in. Buttons are ordered from low to high priority, so a button with ``priority=10`` will be displayed before a button with ``priority=20``.
+
+.. construct_snippet_listing_buttons:
+
+``construct_snippet_listing_buttons``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Modify the final list of snippet listing buttons. The
+  callable passed to this hook receives a list of ``SnippetListingButton`` objects, a user,
+  and a context dictionary as per ``register_snippet_listing_buttons``,
+  and should modify the list of menu items in-place.
+
+  .. code-block:: python
+
+    @hooks.register('construct_snippet_listing_buttons')
+    def remove_snippet_listing_button_item(buttons, snippet, user, context=None):
+        buttons.pop()  # Removes the 'delete' button
+
+Audit log
+---------
+
+.. _register_log_actions:
+
+``register_log_actions``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+    See :ref:`audit_log`
+
+    To add new actions to the registry, call the ``register_action`` method with the action type, its label and the message to be displayed in administrative listings.
+
+    .. code-block:: python
+
+        from django.utils.translation import gettext_lazy as _
+
+        from wagtail.core import hooks
+
+        @hook.register('register_log_actions')
+        def additional_log_actions(actions):
+            actions.register_action('wagtail_package.echo', _('Echo'), _('Sent an echo'))
+
+            def callback_message(data):
+                return _('Hello %(audience)s') % {
+                    'audience': data['audience'],
+                }
+            actions.register_action('wagtail_package.with_callback', _('Callback'), callback_message)
